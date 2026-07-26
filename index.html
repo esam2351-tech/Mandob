@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>مندوب الأدوية</title>
+<meta name="theme-color" content="#0E6E63">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+  :root{
+    --teal:#0E6E63; --teal-dark:#0A4F47; --amber:#C9822E;
+    --bg:#F4F6F3; --ink:#1E2A26; --border:#E3E8E2;
+    --danger:#B3453A; --success:#5C9A6B; --muted:#8A968F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;
+    display:flex; flex-direction:column; min-height:100vh;
+    overflow-x:hidden;
+  }
+  button{font-family:inherit; cursor:pointer; border:none;}
+  input,select{font-family:inherit;}
+  .tabular{font-variant-numeric:tabular-nums;}
+  #header{
+    background:var(--teal); color:#fff; padding:18px 16px 14px;
+    position:sticky; top:0; z-index:30; box-shadow:0 2px 8px rgba(0,0,0,.08);
+  }
+  .header-inner{max-width:460px; margin:0 auto;}
+  .header-row{display:flex; align-items:baseline; justify-content:space-between;}
+  .header-title{font-size:18px; font-weight:700; letter-spacing:-.01em; margin:0;}
+  .header-sub{font-size:12px; opacity:.8;}
+  .header-debt{margin-top:8px; display:flex; align-items:baseline; gap:6px;}
+  .header-debt-amount{font-size:26px; font-weight:800; letter-spacing:-.02em;}
+  #main{flex:1; overflow-y:auto; padding:12px 12px 96px; max-width:460px; width:100%; margin:0 auto;}
+  #tabbar{
+    position:fixed; bottom:0; left:0; right:0; background:#fff;
+    border-top:1px solid var(--border); z-index:40;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .tabbar-inner{max-width:460px; margin:0 auto; display:grid; grid-template-columns:repeat(5,1fr);}
+  .tab-btn{
+    background:none; display:flex; flex-direction:column; align-items:center;
+    gap:3px; padding:10px 0 8px; color:var(--muted); font-size:11px; font-weight:600;
+  }
+  .tab-btn.active{color:var(--teal);}
+  .tab-btn svg{width:20px; height:20px;}
+  .card{background:#fff; border:1px solid var(--border); border-radius:14px; padding:12px;}
+  .stack{display:flex; flex-direction:column; gap:10px;}
+  .row{display:flex; gap:8px;}
+  .row-center{display:flex; align-items:center; gap:8px;}
+  .space-between{display:flex; align-items:center; justify-content:space-between;}
+  .search-box{
+    flex:1; display:flex; align-items:center; gap:8px; background:#fff;
+    border:1px solid var(--border); border-radius:12px; padding:9px 12px;
+  }
+  .search-box input{flex:1; border:none; outline:none; font-size:14px; background:transparent;}
+  .icon-btn{
+    background:var(--teal); color:#fff; border-radius:12px; width:44px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .icon-btn:active{opacity:.8;}
+  .btn-primary{
+    background:var(--teal); color:#fff; font-weight:700; padding:13px; border-radius:12px;
+    width:100%; display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px;
+  }
+  .btn-primary:disabled{opacity:.4;}
+  .btn-primary:active{opacity:.85;}
+  .btn-secondary{
+    background:#fff; color:var(--teal); border:1px dashed var(--teal); font-weight:600;
+    padding:12px; border-radius:12px; width:100%; display:flex; align-items:center;
+    justify-content:center; gap:8px; font-size:14px;
+  }
+  .empty{
+    background:#fff; border:1px dashed #CBD4C9; border-radius:14px; padding:26px 16px; text-align:center;
+  }
+  .empty svg{width:28px; height:28px; color:#B7C0B5; margin-bottom:6px;}
+  .empty-title{font-weight:600; font-size:14px;}
+  .empty-sub{font-size:12px; color:var(--muted); margin-top:4px;}
+  .customer-row{display:flex; align-items:stretch; gap:10px; padding:10px;}
+  .customer-bar{width:6px; border-radius:6px;}
+  .customer-name{display:flex; align-items:center; gap:6px; font-weight:600; font-size:14px;}
+  .customer-sub{font-size:11px; color:var(--muted); margin-top:2px;}
+  .customer-debt{text-align:left;}
+  .customer-debt-amt{font-weight:700;}
+  .customer-debt-lbl{font-size:10px; color:var(--muted);}
+  .field-label{font-size:12px; color:var(--muted); display:block; margin-bottom:4px;}
+  select.select-field{
+    width:100%; background:transparent; border:none; outline:none; font-size:14px; font-weight:600;
+  }
+  input.text-field{
+    width:100%; background:#FAFBFA; border:1px solid var(--border); border-radius:10px;
+    padding:10px 12px; font-size:14px; outline:none;
+  }
+  .qty-stepper{
+    display:flex; align-items:center; gap:6px; background:#FAFBFA; border:1px solid var(--border);
+    border-radius:10px; padding:5px 7px;
+  }
+  .qty-stepper button{
+    width:24px; height:24px; display:flex; align-items:center; justify-content:center;
+    color:var(--muted); font-weight:700; background:none; font-size:16px; border-radius:6px;
+  }
+  .qty-stepper span{width:22px; text-align:center; font-weight:600; font-size:14px;}
+  .line-item{display:flex; align-items:center; gap:8px; padding:10px;}
+  .badge{font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px;}
+  .badge-invoice{background:#E4EEE7; color:var(--teal-dark);}
+  .badge-collect{background:#FBEBD9; color:#8A5A1F;}
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:50; display:flex; align-items:flex-end;
+  }
+  .modal-sheet{
+    background:#fff; width:100%; max-width:460px; margin:0 auto; border-radius:18px 18px 0 0;
+    padding:16px; max-height:75vh; display:flex; flex-direction:column; gap:12px;
+  }
+  .modal-list{overflow-y:auto; display:flex; flex-direction:column; gap:6px;}
+  .type-toggle{display:flex; gap:8px;}
+  .type-toggle button{
+    flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:9px;
+    border-radius:10px; font-size:13px; font-weight:600; border:1px solid var(--border); background:#fff; color:var(--muted);
+  }
+  .type-toggle button.active{border-color:var(--teal); background:#E4EEE7; color:var(--teal-dark);}
+  #toast-container{position:fixed; bottom:90px; left:50%; transform:translateX(-50%); z-index:60;}
+  .toast{
+    background:var(--teal-dark); color:#fff; padding:9px 16px; border-radius:99px; font-size:13px;
+    font-weight:600; box-shadow:0 6px 20px rgba(0,0,0,.2);
+  }
+  .toast.error{background:var(--danger);}
+  .alert-box{
+    background:#FEF6E9; border:1px solid #EBD5B0; border-radius:12px; padding:10px 12px;
+    display:flex; gap:8px; align-items:flex-start; font-size:12px; color:#8A5A1F;
+  }
+  .alert-box svg{width:16px; height:16px; flex-shrink:0; margin-top:1px;}
+  .num-input{
+    flex:1; text-align:center; background:#FAFBFA; border:1px solid var(--border); border-radius:10px;
+    padding:7px; font-size:14px; font-weight:600; outline:none;
+  }
+  .trash-btn{color:#C9CFC7; background:none; padding:4px;}
+  .trash-btn:active{color:var(--danger);}
+</style>
+</head>
+<body>
+  <div id="header"></div>
+  <main id="main"></main>
+  <div id="tabbar"></div>
+  <div id="modal-root"></div>
+  <div id="toast-container"></div>
+
+<script>
+/* ---------------- Icons (inline SVG, no dependency) ---------------- */
+const ICONS = {
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+  invoice:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>',
+  wallet:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>',
+  package:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73Z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></svg>',
+  history:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  building:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v18"/><path d="M6 12H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h2"/><path d="M18 12h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg>',
+  store:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7l1.5-4h17L22 7"/><path d="M2 7h20v3a2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1-2 2 2 2 0 0 1-2-2Z"/><path d="M4 12v8a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-8"/></svg>',
+  alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></svg>',
+  trash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+};
+
+/* ---------------- Storage (real, persistent, per-device) ---------------- */
+const DB_KEYS = { products:'mandoub_products', customers:'mandoub_customers', history:'mandoub_history' };
+function loadDB(key){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : []; }catch(e){ return []; } }
+function saveDB(key, value){ try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){ toast('حصل خطأ في الحفظ على الجهاز', 'error'); } }
+
+const state = {
+  tab: 'dashboard',
+  products: loadDB(DB_KEYS.products),
+  customers: loadDB(DB_KEYS.customers),
+  history: loadDB(DB_KEYS.history),
+  cart: {},
+  invoiceCustomerId: null,
+  collectCustomerId: null,
+  collectRemaining: {},
+  modal: null,
+  dashboardQuery: '',
+  pickerQuery: '',
+};
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function money(n){
+  n = Math.round((n + Number.EPSILON) * 100) / 100;
+  return n.toLocaleString('ar-EG', { minimumFractionDigits:2, maximumFractionDigits:2 });
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+let toastTimer = null;
+function toast(msg, kind){
+  clearTimeout(toastTimer);
+  document.getElementById('toast-container').innerHTML =
+    `<div class="toast ${kind==='error'?'error':''}">${escapeHtml(msg)}</div>`;
+  toastTimer = setTimeout(()=>{ document.getElementById('toast-container').innerHTML=''; }, 2200);
+}
+
+/* ---------------- Persist + mutate helpers ---------------- */
+function setProducts(next){ state.products = next; saveDB(DB_KEYS.products, next); }
+function setCustomers(next){ state.customers = next; saveDB(DB_KEYS.customers, next); }
+function setHistory(next){ state.history = next; saveDB(DB_KEYS.history, next); }
+
+/* ================= RENDER ROOT ================= */
+function render(){
+  document.getElementById('header').innerHTML = renderHeader();
+  document.getElementById('main').innerHTML = renderTab();
+  document.getElementById('tabbar').innerHTML = renderTabBar();
+  document.getElementById('modal-root').innerHTML = state.modal ? renderModal() : '';
+  focusModalField();
+}
+function focusModalField(){
+  const el = document.querySelector('[data-autofocus]');
+  if(el) setTimeout(()=>el.focus(), 30);
+}
+
+function setTab(tab){ state.tab = tab; state.modal = null; render(); }
+
+/* ================= HEADER ================= */
+function renderHeader(){
+  const titles = { dashboard:'العملاء', invoice:'فاتورة جديدة', collect:'التحصيل', products:'الأصناف', history:'السجل' };
+  const totalDebt = state.customers.reduce((s,c)=>s+(c.debt||0),0);
+  let extra = '';
+  if(state.tab === 'dashboard'){
+    extra = `<div class="header-debt"><span class="header-debt-amount tabular">${money(totalDebt)}</span><span class="header-sub">جنيه إجمالي المديونية</span></div>`;
+  }
+  const count = state.tab === 'dashboard' ? `<span class="header-sub">${state.customers.length} عميل</span>` : '';
+  return `<div class="header-inner">
+    <div class="header-row"><h1 class="header-title">${titles[state.tab]}</h1>${count}</div>
+    ${extra}
+  </div>`;
+}
+
+/* ================= TAB BAR ================= */
+function renderTabBar(){
+  const items = [
+    {id:'dashboard', label:'العملاء', icon:ICONS.users},
+    {id:'invoice', label:'فاتورة', icon:ICONS.invoice},
+    {id:'collect', label:'تحصيل', icon:ICONS.wallet},
+    {id:'products', label:'الأصناف', icon:ICONS.package},
+    {id:'history', label:'السجل', icon:ICONS.history},
+  ];
+  return `<div class="tabbar-inner">${items.map(it=>`
+    <button class="tab-btn ${state.tab===it.id?'active':''}" onclick="setTab('${it.id}')">
+      ${it.icon}<span>${it.label}</span>
+    </button>`).join('')}</div>`;
+}
+
+/* ================= TAB DISPATCH ================= */
+function renderTab(){
+  switch(state.tab){
+    case 'dashboard': return renderDashboardTab();
+    case 'invoice': return renderInvoiceTab();
+    case 'collect': return renderCollectTab();
+    case 'products': return renderProductsTab();
+    case 'history': return renderHistoryTab();
+    default: return '';
+  }
+}
+
+/* ================= EMPTY STATE ================= */
+function emptyState(icon, title, sub, actionLabel, actionFn){
+  return `<div class="empty">
+    ${icon}
+    <div class="empty-title">${title}</div>
+    <div class="empty-sub">${sub}</div>
+    ${actionLabel ? `<button class="btn-primary" style="margin-top:12px;width:auto;padding:9px 18px;" onclick="${actionFn}">${actionLabel}</button>` : ''}
+  </div>`;
+}
+
+/* ================= DASHBOARD ================= */
+function filteredCustomers(){
+  return state.customers
+    .filter(c => c.name.includes(state.dashboardQuery))
+    .sort((a,b)=>(b.debt||0)-(a.debt||0));
+}
+function debtColor(debt){
+  if(debt <= 0) return 'var(--success)';
+  if(debt < 2000) return 'var(--amber)';
+  return 'var(--danger)';
+}
+function renderDashboardTab(){
+  return `<div class="stack">
+    <div class="row">
+      <div class="search-box">
+        ${ICONS.search}
+        <input id="customer-search" placeholder="ابحث عن عميل" value="${escapeHtml(state.dashboardQuery)}" oninput="onDashboardSearch(this.value)">
+      </div>
+      <button class="icon-btn" aria-label="إضافة عميل" onclick="openModal('addCustomer')">${ICONS.plus}</button>
+    </div>
+    <div id="customer-list-container">${renderCustomerListHTML()}</div>
+  </div>`;
+}
+function renderCustomerListHTML(){
+  const list = filteredCustomers();
+  if(list.length === 0){
+    return emptyState(ICONS.users, 'لسه مفيش عملاء', 'ضيف أول صيدلية أو مخزن عشان تبدأ تعمل فواتير', 'إضافة عميل', "openModal('addCustomer')");
+  }
+  return `<div class="stack">${list.map(c=>{
+    const stockCount = Object.values(c.items||{}).reduce((s,q)=>s+q,0);
+    const typeIcon = c.type === 'مخزن' ? ICONS.building : ICONS.store;
+    return `<div class="card customer-row">
+      <div class="customer-bar" style="background:${debtColor(c.debt||0)}"></div>
+      <div style="flex:1">
+        <div class="customer-name">${typeIcon}${escapeHtml(c.name)}</div>
+        <div class="customer-sub">${stockCount} صنف حالياً عنده</div>
+      </div>
+      <div class="customer-debt">
+        <div class="customer-debt-amt tabular" style="color:${debtColor(c.debt||0)}">${money(c.debt||0)}</div>
+        <div class="customer-debt-lbl">جنيه مديونية</div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+function onDashboardSearch(v){
+  state.dashboardQuery = v;
+  document.getElementById('customer-list-container').innerHTML = renderCustomerListHTML();
+}
+
+/* ---- Add Customer Modal ---- */
+let newCustomerType = 'صيدلية';
+function openModal(name){ state.modal = name; if(name==='addCustomer') newCustomerType='صيدلية'; render(); }
+function closeModal(){ state.modal = null; render(); }
+function renderModal(){
+  if(state.modal === 'addCustomer') return renderAddCustomerModal();
+  if(state.modal === 'productPicker') return renderProductPickerModal();
+  return '';
+}
+function renderAddCustomerModal(){
+  return `<div class="modal-overlay" onclick="closeModal()">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="space-between">
+        <span style="font-weight:700;font-size:14px;">إضافة عميل جديد</span>
+        <button onclick="closeModal()" style="background:none;color:var(--muted);">${ICONS.x}</button>
+      </div>
+      <div class="type-toggle">
+        <button id="type-btn-صيدلية" class="${newCustomerType==='صيدلية'?'active':''}" onclick="selectCustomerType('صيدلية')">${ICONS.store}صيدلية</button>
+        <button id="type-btn-مخزن" class="${newCustomerType==='مخزن'?'active':''}" onclick="selectCustomerType('مخزن')">${ICONS.building}مخزن</button>
+      </div>
+      <input class="text-field" id="new-customer-name" placeholder="اسم الصيدلية أو المخزن" data-autofocus>
+      <button class="btn-primary" onclick="saveNewCustomer()">${ICONS.check}حفظ العميل</button>
+    </div>
+  </div>`;
+}
+function selectCustomerType(t){
+  newCustomerType = t;
+  document.getElementById('type-btn-صيدلية').classList.toggle('active', t==='صيدلية');
+  document.getElementById('type-btn-مخزن').classList.toggle('active', t==='مخزن');
+}
+function saveNewCustomer(){
+  const name = document.getElementById('new-customer-name').value.trim();
+  if(!name){ toast('اكتب اسم العميل', 'error'); return; }
+  setCustomers([{ id:uid(), name, type:newCustomerType, debt:0, items:{} }, ...state.customers]);
+  state.modal = null;
+  render();
+  toast('اتضاف العميل');
+}
+
+/* ================= INVOICE ================= */
+function renderInvoiceTab(){
+  if(state.customers.length === 0){
+    return emptyState(ICONS.invoice, 'محتاج تضيف عميل الأول', 'روح تبويب العملاء وضيف صيدلية أو مخزن', null, '');
+  }
+  if(state.products.length === 0){
+    return emptyState(ICONS.package, 'محتاج تضيف أصناف الأول', 'روح تبويب الأصناف وضيف اسم الصنف وسعره', null, '');
+  }
+  if(!state.invoiceCustomerId || !state.customers.find(c=>c.id===state.invoiceCustomerId)){
+    state.invoiceCustomerId = state.customers[0].id;
+  }
+  const lines = cartLines();
+  const total = lines.reduce((s,l)=>s+l.subtotal,0);
+
+  return `<div class="stack">
+    <div class="card">
+      <span class="field-label">العميل</span>
+      <select class="select-field" onchange="setInvoiceCustomer(this.value)">
+        ${state.customers.map(c=>`<option value="${c.id}" ${c.id===state.invoiceCustomerId?'selected':''}>${escapeHtml(c.name)}</option>`).join('')}
+      </select>
+    </div>
+    <button class="btn-secondary" onclick="openModal('productPicker')">${ICONS.plus}إضافة صنف للفاتورة</button>
+    <div class="stack" id="invoice-lines">${lines.map(l=>`
+      <div class="card line-item">
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:600;">${escapeHtml(l.name)}</div>
+          <div style="font-size:11px;color:var(--muted);">${money(l.price)} جنيه للوحدة</div>
+        </div>
+        <div class="qty-stepper">
+          <button onclick="setCartQty('${l.productId}', ${l.qty-1})">−</button>
+          <span>${l.qty}</span>
+          <button onclick="setCartQty('${l.productId}', ${l.qty+1})">+</button>
+        </div>
+        <div style="width:64px;text-align:left;font-size:14px;font-weight:700;" class="tabular">${money(l.subtotal)}</div>
+      </div>`).join('')}
+    </div>
+    ${lines.length ? `<div class="card space-between">
+      <span style="font-size:13px;color:var(--muted);font-weight:600;">الإجمالي</span>
+      <span style="font-size:18px;font-weight:800;color:var(--teal-dark);" class="tabular">${money(total)} جنيه</span>
+    </div>` : ''}
+    <button class="btn-primary" ${lines.length===0?'disabled':''} onclick="submitInvoice()">${ICONS.check}تأكيد الفاتورة</button>
+  </div>`;
+}
+function cartLines(){
+  return Object.entries(state.cart).filter(([,q])=>q>0).map(([pid,qty])=>{
+    const p = state.products.find(p=>p.id===pid);
+    if(!p) return null;
+    return { productId:pid, name:p.name, price:p.price, qty, subtotal: p.price*qty };
+  }).filter(Boolean);
+}
+function setInvoiceCustomer(id){ state.invoiceCustomerId = id; render(); }
+function setCartQty(pid, qty){
+  state.cart[pid] = Math.max(0, qty);
+  render();
+}
+function submitInvoice(){
+  const customer = state.customers.find(c=>c.id===state.invoiceCustomerId);
+  const lines = cartLines();
+  const total = lines.reduce((s,l)=>s+l.subtotal,0);
+  if(!customer){ toast('اختار عميل الأول','error'); return; }
+  if(lines.length===0){ toast('ضيف صنف واحد على الأقل','error'); return; }
+  const nextCustomers = state.customers.map(c=>{
+    if(c.id!==customer.id) return c;
+    const items = {...(c.items||{})};
+    lines.forEach(l=>{ items[l.productId] = (items[l.productId]||0) + l.qty; });
+    return {...c, items, debt:(c.debt||0)+total};
+  });
+  setCustomers(nextCustomers);
+  setHistory([{ id:uid(), type:'invoice', customerId:customer.id, customerName:customer.name, date:new Date().toISOString(), lines, total }, ...state.history]);
+  state.cart = {};
+  render();
+  toast(`اتسجلت فاتورة بمبلغ ${money(total)} جنيه`);
+}
+
+/* ---- Product Picker Modal ---- */
+function renderProductPickerModal(){
+  return `<div class="modal-overlay" onclick="closeModal()">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="row-center">
+        ${ICONS.search}
+        <input style="flex:1;border:none;outline:none;font-size:14px;" placeholder="دور على صنف" value="${escapeHtml(state.pickerQuery)}" oninput="onPickerSearch(this.value)" data-autofocus>
+        <button onclick="closeModal()" style="background:none;color:var(--muted);">${ICONS.x}</button>
+      </div>
+      <div class="modal-list" id="picker-list">${renderPickerListHTML()}</div>
+      <button class="btn-primary" onclick="closeModal()">تم</button>
+    </div>
+  </div>`;
+}
+function renderPickerListHTML(){
+  const list = state.products.filter(p=>p.name.includes(state.pickerQuery));
+  if(list.length===0) return `<div class="empty-sub" style="text-align:center;padding:20px 0;">مفيش نتائج</div>`;
+  return list.map(p=>{
+    const qty = state.cart[p.id] || 0;
+    return `<div class="row-center" style="padding:6px 2px;">
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:500;">${escapeHtml(p.name)}</div>
+        <div style="font-size:11px;color:var(--muted);">${money(p.price)} جنيه</div>
+      </div>
+      <div class="qty-stepper">
+        <button onclick="setCartQtyLive('${p.id}', ${qty-1})">−</button>
+        <span>${qty}</span>
+        <button onclick="setCartQtyLive('${p.id}', ${qty+1})">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function onPickerSearch(v){
+  state.pickerQuery = v;
+  document.getElementById('picker-list').innerHTML = renderPickerListHTML();
+}
+function setCartQtyLive(pid, qty){
+  state.cart[pid] = Math.max(0, qty);
+  document.getElementById('picker-list').innerHTML = renderPickerListHTML();
+}
+
+/* ================= COLLECT ================= */
+function customersWithStock(){
+  return state.customers.filter(c=>Object.values(c.items||{}).some(q=>q>0));
+}
+function renderCollectTab(){
+  if(state.customers.length===0){
+    return emptyState(ICONS.wallet, 'محتاج عملاء الأول', 'ضيف عميل وسجله فاتورة الأول', null, '');
+  }
+  const withStock = customersWithStock();
+  if(withStock.length===0){
+    return emptyState(ICONS.wallet, 'مفيش بضاعة عند حد دلوقتي', 'كل العملاء رصيدهم صفر، مفيش حاجة تتحصل', null, '');
+  }
+  if(!state.collectCustomerId || !withStock.find(c=>c.id===state.collectCustomerId)){
+    state.collectCustomerId = withStock[0].id;
+    state.collectRemaining = {};
+  }
+  const customer = state.customers.find(c=>c.id===state.collectCustomerId);
+  const lines = collectLines(customer);
+  const total = lines.reduce((s,l)=>s+l.value,0);
+
+  return `<div class="stack">
+    <div class="card">
+      <span class="field-label">العميل</span>
+      <select class="select-field" onchange="setCollectCustomer(this.value)">
+        ${withStock.map(c=>`<option value="${c.id}" ${c.id===customer.id?'selected':''}>${escapeHtml(c.name)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="alert-box">${ICONS.alert}<div>اكتب الرصيد الفعلي الموجود عند العميل دلوقتي لكل صنف، والبرنامج هيحسبلك اللي اتباع واللي المفروض تحصله.</div></div>
+    <div class="stack" id="collect-lines">${lines.map(l=>renderCollectLineHTML(l)).join('')}</div>
+    <div class="card space-between">
+      <span style="font-size:13px;color:var(--muted);font-weight:600;">المبلغ المطلوب تحصيله</span>
+      <span id="collect-total" style="font-size:18px;font-weight:800;color:var(--teal-dark);" class="tabular">${money(total)} جنيه</span>
+    </div>
+    <button class="btn-primary" onclick="confirmCollection()">${ICONS.check}تأكيد التحصيل</button>
+  </div>`;
+}
+function collectLines(customer){
+  return Object.entries(customer.items||{}).filter(([,q])=>q>0).map(([pid,currentQty])=>{
+    const p = state.products.find(p=>p.id===pid);
+    const rem = state.collectRemaining[pid] !== undefined ? state.collectRemaining[pid] : currentQty;
+    const sold = Math.max(0, currentQty - rem);
+    return { productId:pid, name: p ? p.name : 'صنف محذوف', price: p ? p.price : 0, currentQty, remaining:rem, sold, value: sold * (p ? p.price : 0) };
+  });
+}
+function renderCollectLineHTML(l){
+  return `<div class="card" id="collect-row-${l.productId}">
+    <div class="space-between" style="margin-bottom:8px;">
+      <div>
+        <div style="font-size:14px;font-weight:600;">${escapeHtml(l.name)}</div>
+        <div style="font-size:11px;color:var(--muted);">عنده ${l.currentQty} × ${money(l.price)} جنيه</div>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:11px;color:var(--muted);">المباع</div>
+        <div class="tabular" id="sold-${l.productId}" style="font-weight:700;color:${l.sold>0?'var(--teal-dark)':'#B7C0B5'};">${l.sold}</div>
+      </div>
+    </div>
+    <div class="row-center">
+      <label style="font-size:12px;color:var(--muted);flex-shrink:0;">الرصيد الحالي عنده</label>
+      <input type="number" min="0" max="${l.currentQty}" class="num-input" id="remaining-${l.productId}" value="${l.remaining}"
+        oninput="onRemainingInput('${l.productId}', ${l.currentQty}, ${l.price})">
+      <div style="width:80px;text-align:left;font-size:14px;font-weight:700;flex-shrink:0;" class="tabular" id="value-${l.productId}">${money(l.value)}</div>
+    </div>
+  </div>`;
+}
+function setCollectCustomer(id){
+  state.collectCustomerId = id;
+  state.collectRemaining = {};
+  render();
+}
+function onRemainingInput(pid, currentQty, price){
+  let v = Number(document.getElementById('remaining-'+pid).value);
+  if(isNaN(v)) v = 0;
+  v = Math.min(Math.max(0, v), currentQty);
+  state.collectRemaining[pid] = v;
+  const sold = Math.max(0, currentQty - v);
+  const value = sold * price;
+  document.getElementById('sold-'+pid).textContent = sold;
+  document.getElementById('sold-'+pid).style.color = sold > 0 ? 'var(--teal-dark)' : '#B7C0B5';
+  document.getElementById('value-'+pid).textContent = money(value);
+  const customer = state.customers.find(c=>c.id===state.collectCustomerId);
+  const total = collectLines(customer).reduce((s,l)=>s+l.value,0);
+  document.getElementById('collect-total').textContent = money(total) + ' جنيه';
+}
+function confirmCollection(){
+  const customer = state.customers.find(c=>c.id===state.collectCustomerId);
+  const lines = collectLines(customer);
+  const total = lines.reduce((s,l)=>s+l.value,0);
+  if(total <= 0){ toast('مفيش مبلغ للتحصيل، راجع الأرصدة', 'error'); return; }
+  const nextCustomers = state.customers.map(c=>{
+    if(c.id!==customer.id) return c;
+    const items = {...c.items};
+    lines.forEach(l=>{ items[l.productId] = l.remaining; });
+    return {...c, items, debt: Math.max(0, (c.debt||0)-total)};
+  });
+  setCustomers(nextCustomers);
+  setHistory([{ id:uid(), type:'collect', customerId:customer.id, customerName:customer.name, date:new Date().toISOString(), lines: lines.filter(l=>l.sold>0), total }, ...state.history]);
+  state.collectRemaining = {};
+  render();
+  toast(`اتحصل ${money(total)} جنيه من ${customer.name}`);
+}
+
+/* ================= PRODUCTS ================= */
+function renderProductsTab(){
+  return `<div class="stack">
+    <div class="card stack">
+      <div style="font-size:14px;font-weight:700;">إضافة صنف جديد</div>
+      <input class="text-field" id="new-product-name" placeholder="اسم الصنف">
+      <input class="text-field" id="new-product-price" type="number" placeholder="السعر بالجنيه">
+      <button class="btn-primary" onclick="addProduct()">إضافة</button>
+    </div>
+    ${state.products.length===0
+      ? emptyState(ICONS.package, 'مفيش أصناف لسه', 'ضيف اسم الصنف وسعره فوق', null, '')
+      : `<div class="stack">${state.products.map(p=>`
+        <div class="card row-center">
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:600;">${escapeHtml(p.name)}</div>
+            <div style="font-size:11px;color:var(--muted);">${money(p.price)} جنيه</div>
+          </div>
+          <button class="trash-btn" onclick="removeProduct('${p.id}')">${ICONS.trash}</button>
+        </div>`).join('')}</div>`}
+  </div>`;
+}
+function addProduct(){
+  const name = document.getElementById('new-product-name').value.trim();
+  const price = Number(document.getElementById('new-product-price').value);
+  if(!name || !price || price<=0){ toast('اكتب اسم الصنف والسعر', 'error'); return; }
+  setProducts([{ id:uid(), name, price }, ...state.products]);
+  render();
+  toast('اتضاف الصنف');
+}
+function removeProduct(id){
+  setProducts(state.products.filter(p=>p.id!==id));
+  render();
+}
+
+/* ================= HISTORY ================= */
+function renderHistoryTab(){
+  if(state.history.length===0){
+    return emptyState(ICONS.history, 'مفيش حركات لسه', 'الفواتير والتحصيلات هتظهر هنا', null, '');
+  }
+  return `<div class="stack">${state.history.map(h=>{
+    const dateStr = new Date(h.date).toLocaleDateString('ar-EG', {day:'numeric', month:'short'});
+    const badgeClass = h.type==='invoice' ? 'badge-invoice' : 'badge-collect';
+    const badgeLabel = h.type==='invoice' ? 'فاتورة' : 'تحصيل';
+    const color = h.type==='invoice' ? 'var(--teal-dark)' : '#8A5A1F';
+    const linesHtml = h.lines.map(l=>`<span style="font-size:11px;color:var(--muted);">${escapeHtml(l.name)} ×${l.qty ?? l.sold}</span>`).join(' ');
+    return `<div class="card">
+      <div class="space-between">
+        <div class="row-center"><span class="badge ${badgeClass}">${badgeLabel}</span><span style="font-size:14px;font-weight:600;">${escapeHtml(h.customerName)}</span></div>
+        <span style="font-size:11px;color:var(--muted);">${dateStr}</span>
+      </div>
+      <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;">${linesHtml}</div>
+      <div style="margin-top:6px;text-align:left;font-weight:700;color:${color};" class="tabular">${money(h.total)} جنيه</div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+/* ================= INIT ================= */
+render();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
+</script>
+</body>
+</html>
