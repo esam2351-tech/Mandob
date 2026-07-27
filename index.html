@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>مندوب الأدوية</title>
-<meta name="theme-color" content="#0E6E63">
+<meta name="theme-color" content="#243B6B">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -12,9 +12,11 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
   :root{
-    --teal:#0E6E63; --teal-dark:#0A4F47; --amber:#C9822E;
-    --bg:#F4F6F3; --ink:#1E2A26; --border:#E3E8E2;
-    --danger:#B3453A; --success:#5C9A6B; --muted:#8A968F;
+    --ink:#1C2B33; --bg:#EEF1EF; --surface:#FFFFFF;
+    --primary:#243B6B; --primary-dark:#182849;
+    --accent:#DB8A34; --accent-dark:#B96F22;
+    --success:#3D8361; --warning:#C98A2E; --danger:#B23A48;
+    --border:#E2E6E4; --muted:#8790A0;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;height:100%;}
@@ -27,135 +29,174 @@
   }
   button{font-family:inherit; cursor:pointer; border:none;}
   input,select{font-family:inherit;}
-  .tabular{font-variant-numeric:tabular-nums;}
+  .tabular{font-variant-numeric:tabular-nums; letter-spacing:.01em;}
+  a{color:inherit;}
+
   #header{
-    background:var(--teal); color:#fff; padding:18px 16px 14px;
-    position:sticky; top:0; z-index:30; box-shadow:0 2px 8px rgba(0,0,0,.08);
+    background:linear-gradient(155deg, var(--primary), var(--primary-dark));
+    color:#fff; padding:20px 16px 16px; position:sticky; top:0; z-index:30;
+    border-radius:0 0 20px 20px; box-shadow:0 6px 18px rgba(24,40,73,.18);
   }
   .header-inner{max-width:460px; margin:0 auto;}
   .header-row{display:flex; align-items:baseline; justify-content:space-between;}
-  .header-title{font-size:18px; font-weight:700; letter-spacing:-.01em; margin:0;}
-  .header-sub{font-size:12px; opacity:.8;}
-  .header-debt{margin-top:8px; display:flex; align-items:baseline; gap:6px;}
-  .header-debt-amount{font-size:26px; font-weight:800; letter-spacing:-.02em;}
-  #main{flex:1; overflow-y:auto; padding:12px 12px 96px; max-width:460px; width:100%; margin:0 auto;}
+  .header-title{font-size:19px; font-weight:800; letter-spacing:-.01em; margin:0;}
+  .header-sub{font-size:11.5px; opacity:.75; font-weight:600;}
+  .settings-btn{background:rgba(255,255,255,.14); border-radius:10px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; color:#fff;}
+  .header-debt{margin-top:10px; display:flex; align-items:baseline; gap:6px;}
+  .header-debt-amount{font-size:28px; font-weight:800; letter-spacing:-.01em;}
+  .stat-strip{display:flex; gap:8px; margin-top:12px;}
+  .stat-chip{flex:1; background:rgba(255,255,255,.12); border-radius:12px; padding:8px 10px;}
+  .stat-chip-label{font-size:10px; opacity:.75; font-weight:600;}
+  .stat-chip-value{font-size:15px; font-weight:800; margin-top:2px;}
+
+  #main{flex:1; overflow-y:auto; padding:12px 12px 100px; max-width:460px; width:100%; margin:0 auto;}
   #tabbar{
-    position:fixed; bottom:0; left:0; right:0; background:#fff;
+    position:fixed; bottom:0; left:0; right:0; background:var(--surface);
     border-top:1px solid var(--border); z-index:40;
     padding-bottom:env(safe-area-inset-bottom);
+    box-shadow:0 -2px 10px rgba(24,40,73,.05);
   }
-  .tabbar-inner{max-width:460px; margin:0 auto; display:grid; grid-template-columns:repeat(5,1fr);}
+  .tabbar-inner{max-width:460px; margin:0 auto; display:grid; grid-template-columns:repeat(5,1fr); padding:6px 6px 4px;}
   .tab-btn{
     background:none; display:flex; flex-direction:column; align-items:center;
-    gap:3px; padding:10px 0 8px; color:var(--muted); font-size:11px; font-weight:600;
+    gap:3px; padding:6px 0 6px; color:var(--muted); font-size:10.5px; font-weight:700;
   }
-  .tab-btn.active{color:var(--teal);}
-  .tab-btn svg{width:20px; height:20px;}
-  .card{background:#fff; border:1px solid var(--border); border-radius:14px; padding:12px;}
+  .tab-btn .tab-icon-wrap{width:38px; height:26px; border-radius:10px; display:flex; align-items:center; justify-content:center;}
+  .tab-btn.active .tab-icon-wrap{background:#EFE3D0;}
+  .tab-btn.active{color:var(--primary);}
+  .tab-btn svg{width:19px; height:19px;}
+
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:13px;
+    box-shadow:0 1px 2px rgba(24,40,73,.03), 0 6px 14px rgba(24,40,73,.04);}
   .stack{display:flex; flex-direction:column; gap:10px;}
   .row{display:flex; gap:8px;}
   .row-center{display:flex; align-items:center; gap:8px;}
   .space-between{display:flex; align-items:center; justify-content:space-between;}
   .search-box{
-    flex:1; display:flex; align-items:center; gap:8px; background:#fff;
-    border:1px solid var(--border); border-radius:12px; padding:9px 12px;
+    flex:1; display:flex; align-items:center; gap:8px; background:var(--surface);
+    border:1px solid var(--border); border-radius:13px; padding:9px 12px;
   }
   .search-box input{flex:1; border:none; outline:none; font-size:14px; background:transparent;}
   .icon-btn{
-    background:var(--teal); color:#fff; border-radius:12px; width:44px;
-    display:flex; align-items:center; justify-content:center;
+    background:var(--accent); color:#fff; border-radius:13px; width:44px;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(219,138,52,.3);
   }
-  .icon-btn:active{opacity:.8;}
+  .icon-btn:active{opacity:.85;}
   .btn-primary{
-    background:var(--teal); color:#fff; font-weight:700; padding:13px; border-radius:12px;
+    background:var(--accent); color:#fff; font-weight:700; padding:13px; border-radius:13px;
     width:100%; display:flex; align-items:center; justify-content:center; gap:8px; font-size:14px;
+    box-shadow:0 4px 10px rgba(219,138,52,.25);
   }
-  .btn-primary:disabled{opacity:.4;}
-  .btn-primary:active{opacity:.85;}
+  .btn-primary:disabled{opacity:.4; box-shadow:none;}
+  .btn-primary:active{opacity:.88;}
+  .btn-danger{background:var(--danger); box-shadow:0 4px 10px rgba(178,58,72,.25);}
   .btn-secondary{
-    background:#fff; color:var(--teal); border:1px dashed var(--teal); font-weight:600;
-    padding:12px; border-radius:12px; width:100%; display:flex; align-items:center;
-    justify-content:center; gap:8px; font-size:14px;
+    background:var(--surface); color:var(--primary); border:1.5px dashed var(--primary); font-weight:700;
+    padding:11px; border-radius:13px; width:100%; display:flex; align-items:center;
+    justify-content:center; gap:8px; font-size:13.5px;
   }
+  .btn-ghost{background:#F2F0EA; color:var(--ink); font-weight:600; padding:10px; border-radius:12px;
+    width:100%; display:flex; align-items:center; justify-content:center; gap:6px; font-size:13px;}
   .empty{
-    background:#fff; border:1px dashed #CBD4C9; border-radius:14px; padding:26px 16px; text-align:center;
+    background:var(--surface); border:1.5px dashed #CBD2D8; border-radius:16px; padding:28px 16px; text-align:center;
   }
-  .empty svg{width:28px; height:28px; color:#B7C0B5; margin-bottom:6px;}
-  .empty-title{font-weight:600; font-size:14px;}
+  .empty svg{width:28px; height:28px; color:#B7C0C6; margin-bottom:6px;}
+  .empty-title{font-weight:700; font-size:14px;}
   .empty-sub{font-size:12px; color:var(--muted); margin-top:4px;}
-  .customer-row{display:flex; align-items:stretch; gap:10px; padding:10px;}
-  .customer-bar{width:6px; border-radius:6px;}
-  .customer-name{display:flex; align-items:center; gap:6px; font-weight:600; font-size:14px;}
+
+  .stamp{
+    width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; font-weight:800; font-size:14px; border:2px solid; position:relative;
+  }
+  .stamp svg{width:17px; height:17px;}
+
+  .customer-row{display:flex; align-items:center; gap:11px; padding:11px;}
+  .customer-name{font-weight:700; font-size:14px;}
   .customer-sub{font-size:11px; color:var(--muted); margin-top:2px;}
   .customer-debt{text-align:left;}
-  .customer-debt-amt{font-weight:700;}
-  .customer-debt-lbl{font-size:10px; color:var(--muted);}
-  .field-label{font-size:12px; color:var(--muted); display:block; margin-bottom:4px;}
+  .customer-debt-amt{font-weight:800;}
+  .customer-debt-lbl{font-size:9.5px; color:var(--muted); font-weight:600;}
+  .field-label{font-size:11.5px; color:var(--muted); font-weight:700; display:block; margin-bottom:4px; letter-spacing:.01em;}
   select.select-field{
-    width:100%; background:transparent; border:none; outline:none; font-size:14px; font-weight:600;
+    width:100%; background:transparent; border:none; outline:none; font-size:14px; font-weight:700;
   }
   input.text-field{
-    width:100%; background:#FAFBFA; border:1px solid var(--border); border-radius:10px;
+    width:100%; background:#FAFBFA; border:1.5px solid var(--border); border-radius:11px;
     padding:10px 12px; font-size:14px; outline:none;
   }
+  input.text-field:focus{border-color:var(--primary);}
   .qty-stepper{
-    display:flex; align-items:center; gap:6px; background:#FAFBFA; border:1px solid var(--border);
-    border-radius:10px; padding:5px 7px;
+    display:flex; align-items:center; gap:6px; background:#FAFBFA; border:1.5px solid var(--border);
+    border-radius:11px; padding:5px 7px;
   }
   .qty-stepper button{
     width:24px; height:24px; display:flex; align-items:center; justify-content:center;
-    color:var(--muted); font-weight:700; background:none; font-size:16px; border-radius:6px;
+    color:var(--primary); font-weight:800; background:none; font-size:16px; border-radius:6px;
   }
-  .qty-stepper span{width:22px; text-align:center; font-weight:600; font-size:14px;}
-  .line-item{display:flex; align-items:center; gap:8px; padding:10px;}
-  .badge{font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px;}
-  .badge-invoice{background:#E4EEE7; color:var(--teal-dark);}
-  .badge-collect{background:#FBEBD9; color:#8A5A1F;}
+  .qty-stepper span{width:22px; text-align:center; font-weight:700; font-size:14px;}
+  .line-item{display:flex; align-items:center; gap:8px; padding:11px;}
+  .badge{font-size:10px; font-weight:800; padding:3px 9px; border-radius:99px;}
+  .badge-invoice{background:#E2E7F0; color:var(--primary);}
+  .badge-collect{background:#F3E6D2; color:var(--accent-dark);}
+  .badge-return{background:#F3DEE0; color:var(--danger);}
   .modal-overlay{
-    position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:50; display:flex; align-items:flex-end;
+    position:fixed; inset:0; background:rgba(20,28,40,.45); z-index:50; display:flex; align-items:flex-end;
   }
   .modal-sheet{
-    background:#fff; width:100%; max-width:460px; margin:0 auto; border-radius:18px 18px 0 0;
-    padding:16px; max-height:75vh; display:flex; flex-direction:column; gap:12px;
+    background:var(--surface); width:100%; max-width:460px; margin:0 auto; border-radius:20px 20px 0 0;
+    padding:16px; max-height:82vh; display:flex; flex-direction:column; gap:12px; overflow-y:auto;
   }
   .modal-list{overflow-y:auto; display:flex; flex-direction:column; gap:6px;}
   .type-toggle{display:flex; gap:8px;}
   .type-toggle button{
     flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:9px;
-    border-radius:10px; font-size:13px; font-weight:600; border:1px solid var(--border); background:#fff; color:var(--muted);
+    border-radius:11px; font-size:13px; font-weight:700; border:1.5px solid var(--border); background:#fff; color:var(--muted);
   }
-  .type-toggle button.active{border-color:var(--teal); background:#E4EEE7; color:var(--teal-dark);}
-  #toast-container{position:fixed; bottom:90px; left:50%; transform:translateX(-50%); z-index:60;}
+  .type-toggle button.active{border-color:var(--primary); background:#E2E7F0; color:var(--primary);}
+  .type-toggle button svg{width:15px; height:15px;}
+  #toast-container{position:fixed; bottom:92px; left:50%; transform:translateX(-50%); z-index:60;}
   .toast{
-    background:var(--teal-dark); color:#fff; padding:9px 16px; border-radius:99px; font-size:13px;
-    font-weight:600; box-shadow:0 6px 20px rgba(0,0,0,.2);
+    background:var(--primary-dark); color:#fff; padding:9px 16px; border-radius:99px; font-size:13px;
+    font-weight:700; box-shadow:0 6px 20px rgba(0,0,0,.25);
   }
   .toast.error{background:var(--danger);}
   .alert-box{
-    background:#FEF6E9; border:1px solid #EBD5B0; border-radius:12px; padding:10px 12px;
-    display:flex; gap:8px; align-items:flex-start; font-size:12px; color:#8A5A1F;
+    background:#FBF1E1; border:1px solid #ECD8B2; border-radius:13px; padding:10px 12px;
+    display:flex; gap:8px; align-items:flex-start; font-size:12px; color:#7A5A1E;
   }
-  .alert-box svg{width:16px; height:16px; flex-shrink:0; margin-top:1px;}
+  .alert-box svg{width:16px; height:16px; flex-shrink:0; margin-top:1px; color:var(--warning);}
+  .banner-danger{background:#FBEAEA; border:1px solid #EAC6C9; color:#7A2732;}
+  .banner-danger svg{color:var(--danger);}
   .num-input{
-    flex:1; text-align:center; background:#FAFBFA; border:1px solid var(--border); border-radius:10px;
-    padding:7px; font-size:14px; font-weight:600; outline:none;
+    flex:1; text-align:center; background:#FAFBFA; border:1.5px solid var(--border); border-radius:11px;
+    padding:7px; font-size:14px; font-weight:700; outline:none;
   }
   .icon-btn svg{width:20px; height:20px;}
-  .type-toggle button svg{width:15px; height:15px;}
-  .customer-name svg{width:14px; height:14px;}
   .trash-btn{color:#C9CFC7; background:none; padding:4px;}
   .trash-btn:active{color:var(--danger);}
   .trash-btn svg{width:17px; height:17px;}
-  .receipt-paper{background:#FAFBFA; border:1px dashed var(--border); border-radius:10px; padding:14px;}
-  .receipt-divider{border-top:1px dashed var(--border); margin:10px 0;}
-  .receipt-table{display:flex; flex-direction:column; gap:6px;}
+
+  .receipt-paper{
+    background:#FCFBF8; border-radius:4px; padding:16px 14px; position:relative;
+    background-image:
+      radial-gradient(circle 6px at 0 0, transparent 6px, #FCFBF8 6.5px),
+      radial-gradient(circle 6px at 100% 0, transparent 6px, #FCFBF8 6.5px),
+      radial-gradient(circle 6px at 0 100%, transparent 6px, #FCFBF8 6.5px),
+      radial-gradient(circle 6px at 100% 100%, transparent 6px, #FCFBF8 6.5px);
+    border:1px dashed #D8D2C4;
+  }
+  .receipt-divider{border-top:1.5px dashed #D8D2C4; margin:10px 0;}
+  .receipt-table{display:flex; flex-direction:column; gap:7px;}
   .receipt-row{display:flex; align-items:center; font-size:12px; gap:4px;}
-  .receipt-head{font-weight:700; color:var(--muted); font-size:11px;}
-  .stock-badge{font-size:11px; font-weight:700; padding:2px 8px; border-radius:99px; flex-shrink:0;}
-  .stock-ok{background:#E4EEE7; color:var(--success);}
-  .stock-low{background:#FBEBD9; color:var(--amber);}
-  .stock-out{background:#FBEAE8; color:var(--danger);}
-  .receive-btn{background:#F0F3EF; color:var(--teal-dark); font-weight:600; font-size:11px; padding:6px 10px; border-radius:8px; display:flex; align-items:center; gap:4px; flex-shrink:0;}
+  .receipt-head{font-weight:800; color:var(--muted); font-size:10.5px; text-transform:uppercase; letter-spacing:.03em;}
+  .stock-badge{font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:99px; flex-shrink:0;}
+  .stock-ok{background:#DEEDE3; color:var(--success);}
+  .stock-low{background:#F6E7CC; color:var(--warning);}
+  .stock-out{background:#F6DBDD; color:var(--danger);}
+  .receive-btn{background:#EFE9DC; color:var(--accent-dark); font-weight:700; font-size:11px; padding:6px 10px; border-radius:9px; display:flex; align-items:center; gap:4px; flex-shrink:0;}
+  .call-link{background:#E2E7F0; color:var(--primary); font-weight:700; font-size:12px; padding:8px 10px; border-radius:10px; display:flex; align-items:center; justify-content:center; gap:6px; text-decoration:none; flex:1;}
+  .settings-row{display:flex; align-items:center; gap:10px; padding:12px; border-radius:12px; background:#F6F7F5; font-size:13px; font-weight:700;}
+  .settings-row svg{color:var(--primary);}
   @media print{
     #header, #tabbar, #toast-container, #main{display:none !important;}
     .modal-overlay{position:static !important; background:none !important; padding:0 !important;}
@@ -170,9 +211,9 @@
   <div id="tabbar"></div>
   <div id="modal-root"></div>
   <div id="toast-container"></div>
+  <input type="file" id="import-file-input" accept="application/json" style="display:none;">
 
 <script>
-/* ---------------- Icons (inline SVG, no dependency) ---------------- */
 const ICONS = {
   users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
   invoice:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>',
@@ -190,9 +231,13 @@ const ICONS = {
   eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
   printer:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>',
   boxes:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.97 12.92 12 18l9.03-5.08M2.97 12.92 12 8l9.03 4.92M2.97 12.92V17a1 1 0 0 0 .5.87L12 22l8.53-4.13a1 1 0 0 0 .5-.87v-4.08M12 8 3 3l9-2 9 2-9 5Z"/></svg>',
+  undo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>',
+  download:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>',
+  upload:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>',
+  phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>',
 };
 
-/* ---------------- Storage (real, persistent, per-device) ---------------- */
 const DB_KEYS = { products:'mandoub_products', customers:'mandoub_customers', history:'mandoub_history' };
 function loadDB(key){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : []; }catch(e){ return []; } }
 function saveDB(key, value){ try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){ toast('حصل خطأ في الحفظ على الجهاز', 'error'); } }
@@ -204,8 +249,11 @@ const state = {
   history: loadDB(DB_KEYS.history),
   cart: {},
   invoiceCustomerId: null,
+  invoiceDiscountPercent: 0,
   collectCustomerId: null,
   collectRemaining: {},
+  returnCustomerId: null,
+  returnQty: {},
   modal: null,
   dashboardQuery: '',
   pickerQuery: '',
@@ -222,21 +270,23 @@ function money(n){
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+function isToday(iso){
+  const d = new Date(iso), n = new Date();
+  return d.getFullYear()===n.getFullYear() && d.getMonth()===n.getMonth() && d.getDate()===n.getDate();
+}
 
 let toastTimer = null;
 function toast(msg, kind){
   clearTimeout(toastTimer);
   document.getElementById('toast-container').innerHTML =
-    `<div class="toast ${kind==='error'?'error':''}">${escapeHtml(msg)}</div>`;
-  toastTimer = setTimeout(()=>{ document.getElementById('toast-container').innerHTML=''; }, 2200);
+    '<div class="toast ' + (kind==='error'?'error':'') + '">' + escapeHtml(msg) + '</div>';
+  toastTimer = setTimeout(()=>{ document.getElementById('toast-container').innerHTML=''; }, 2400);
 }
 
-/* ---------------- Persist + mutate helpers ---------------- */
 function setProducts(next){ state.products = next; saveDB(DB_KEYS.products, next); }
 function setCustomers(next){ state.customers = next; saveDB(DB_KEYS.customers, next); }
 function setHistory(next){ state.history = next; saveDB(DB_KEYS.history, next); }
 
-/* ================= RENDER ROOT ================= */
 function render(){
   document.getElementById('header').innerHTML = renderHeader();
   document.getElementById('main').innerHTML = renderTab();
@@ -248,25 +298,33 @@ function focusModalField(){
   const el = document.querySelector('[data-autofocus]');
   if(el) setTimeout(()=>el.focus(), 30);
 }
-
 function setTab(tab){ state.tab = tab; state.modal = null; render(); }
 
-/* ================= HEADER ================= */
 function renderHeader(){
   const titles = { dashboard:'العملاء', invoice:'فاتورة جديدة', collect:'التحصيل', products:'الأصناف والمخزون', history:'السجل' };
   const totalDebt = state.customers.reduce((s,c)=>s+(c.debt||0),0);
+  const count = state.tab === 'dashboard' ? '<span class="header-sub">' + state.customers.length + ' عميل</span>' : '';
   let extra = '';
   if(state.tab === 'dashboard'){
-    extra = `<div class="header-debt"><span class="header-debt-amount tabular">${money(totalDebt)}</span><span class="header-sub">جنيه إجمالي المديونية</span></div>`;
+    const todaysInvoices = state.history.filter(h=>h.type==='invoice' && isToday(h.date));
+    const todaysCollections = state.history.filter(h=>h.type==='collect' && isToday(h.date));
+    const invSum = todaysInvoices.reduce((s,h)=>s+h.total,0);
+    const colSum = todaysCollections.reduce((s,h)=>s+h.total,0);
+    extra = '<div class="header-debt"><span class="header-debt-amount tabular">' + money(totalDebt) + '</span><span class="header-sub">جنيه إجمالي المديونية</span></div>' +
+    '<div class="stat-strip">' +
+      '<div class="stat-chip"><div class="stat-chip-label">مبيعات النهارده</div><div class="stat-chip-value tabular">' + money(invSum) + '</div></div>' +
+      '<div class="stat-chip"><div class="stat-chip-label">تحصيل النهارده</div><div class="stat-chip-value tabular">' + money(colSum) + '</div></div>' +
+    '</div>';
   }
-  const count = state.tab === 'dashboard' ? `<span class="header-sub">${state.customers.length} عميل</span>` : '';
-  return `<div class="header-inner">
-    <div class="header-row"><h1 class="header-title">${titles[state.tab]}</h1>${count}</div>
-    ${extra}
-  </div>`;
+  return '<div class="header-inner">' +
+    '<div class="header-row">' +
+      '<h1 class="header-title">' + titles[state.tab] + '</h1>' +
+      '<div class="row-center">' + count + '<button class="settings-btn" onclick="openModal(\'settings\')">' + ICONS.gear + '</button></div>' +
+    '</div>' +
+    extra +
+  '</div>';
 }
 
-/* ================= TAB BAR ================= */
 function renderTabBar(){
   const items = [
     {id:'dashboard', label:'العملاء', icon:ICONS.users},
@@ -275,13 +333,12 @@ function renderTabBar(){
     {id:'products', label:'الأصناف', icon:ICONS.package},
     {id:'history', label:'السجل', icon:ICONS.history},
   ];
-  return `<div class="tabbar-inner">${items.map(it=>`
-    <button class="tab-btn ${state.tab===it.id?'active':''}" onclick="setTab('${it.id}')">
-      ${it.icon}<span>${it.label}</span>
-    </button>`).join('')}</div>`;
+  return '<div class="tabbar-inner">' + items.map(it=>
+    '<button class="tab-btn ' + (state.tab===it.id?'active':'') + '" onclick="setTab(\'' + it.id + '\')">' +
+      '<span class="tab-icon-wrap">' + it.icon + '</span><span>' + it.label + '</span>' +
+    '</button>').join('') + '</div>';
 }
 
-/* ================= TAB DISPATCH ================= */
 function renderTab(){
   switch(state.tab){
     case 'dashboard': return renderDashboardTab();
@@ -293,17 +350,15 @@ function renderTab(){
   }
 }
 
-/* ================= EMPTY STATE ================= */
 function emptyState(icon, title, sub, actionLabel, actionFn){
-  return `<div class="empty">
-    ${icon}
-    <div class="empty-title">${title}</div>
-    <div class="empty-sub">${sub}</div>
-    ${actionLabel ? `<button class="btn-primary" style="margin-top:12px;width:auto;padding:9px 18px;" onclick="${actionFn}">${actionLabel}</button>` : ''}
-  </div>`;
+  return '<div class="empty">' +
+    icon +
+    '<div class="empty-title">' + title + '</div>' +
+    '<div class="empty-sub">' + sub + '</div>' +
+    (actionLabel ? ('<button class="btn-primary" style="margin-top:12px;width:auto;padding:9px 18px;" onclick="' + actionFn + '">' + actionLabel + '</button>') : '') +
+  '</div>';
 }
 
-/* ================= DASHBOARD ================= */
 function filteredCustomers(){
   return state.customers
     .filter(c => c.name.includes(state.dashboardQuery))
@@ -311,48 +366,53 @@ function filteredCustomers(){
 }
 function debtColor(debt){
   if(debt <= 0) return 'var(--success)';
-  if(debt < 2000) return 'var(--amber)';
+  if(debt < 2000) return 'var(--warning)';
   return 'var(--danger)';
 }
+function lowStockProducts(){
+  return state.products.filter(p=>(p.stock||0) <= 5);
+}
 function renderDashboardTab(){
-  return `<div class="stack">
-    <div class="row">
-      <div class="search-box">
-        ${ICONS.search}
-        <input id="customer-search" placeholder="ابحث عن عميل" value="${escapeHtml(state.dashboardQuery)}" oninput="onDashboardSearch(this.value)">
-      </div>
-      <button class="icon-btn" aria-label="إضافة عميل" onclick="openModal('addCustomer')">${ICONS.plus}</button>
-    </div>
-    <div id="customer-list-container">${renderCustomerListHTML()}</div>
-  </div>`;
+  const low = lowStockProducts();
+  return '<div class="stack">' +
+    (low.length ? ('<div class="alert-box banner-danger" style="cursor:pointer;" onclick="setTab(\'products\')">' + ICONS.alert + '<div>' + low.length + ' صنف قارب على النفاد بالمخزون — دوس هنا تراجعهم</div></div>') : '') +
+    '<div class="row">' +
+      '<div class="search-box">' +
+        ICONS.search +
+        '<input id="customer-search" placeholder="ابحث عن عميل" value="' + escapeHtml(state.dashboardQuery) + '" oninput="onDashboardSearch(this.value)">' +
+      '</div>' +
+      '<button class="icon-btn" aria-label="إضافة عميل" onclick="openModal(\'addCustomer\')">' + ICONS.plus + '</button>' +
+    '</div>' +
+    '<div id="customer-list-container">' + renderCustomerListHTML() + '</div>' +
+  '</div>';
 }
 function renderCustomerListHTML(){
   const list = filteredCustomers();
   if(list.length === 0){
     return emptyState(ICONS.users, 'لسه مفيش عملاء', 'ضيف أول صيدلية أو مخزن عشان تبدأ تعمل فواتير', 'إضافة عميل', "openModal('addCustomer')");
   }
-  return `<div class="stack">${list.map(c=>{
+  return '<div class="stack">' + list.map(c=>{
     const stockCount = Object.values(c.items||{}).reduce((s,q)=>s+q,0);
     const typeIcon = c.type === 'مخزن' ? ICONS.building : ICONS.store;
-    return `<div class="card customer-row" style="cursor:pointer;" onclick="openCustomerDetail('${c.id}')">
-      <div class="customer-bar" style="background:${debtColor(c.debt||0)}"></div>
-      <div style="flex:1">
-        <div class="customer-name">${typeIcon}${escapeHtml(c.name)}</div>
-        <div class="customer-sub">${stockCount} صنف حالياً عنده</div>
-      </div>
-      <div class="customer-debt">
-        <div class="customer-debt-amt tabular" style="color:${debtColor(c.debt||0)}">${money(c.debt||0)}</div>
-        <div class="customer-debt-lbl">جنيه مديونية</div>
-      </div>
-    </div>`;
-  }).join('')}</div>`;
+    const col = debtColor(c.debt||0);
+    return '<div class="card customer-row" style="cursor:pointer;" onclick="openCustomerDetail(\'' + c.id + '\')">' +
+      '<div class="stamp" style="border-color:' + col + '; color:' + col + ';">' + typeIcon + '</div>' +
+      '<div style="flex:1">' +
+        '<div class="customer-name">' + escapeHtml(c.name) + '</div>' +
+        '<div class="customer-sub">' + stockCount + ' صنف حالياً عنده</div>' +
+      '</div>' +
+      '<div class="customer-debt">' +
+        '<div class="customer-debt-amt tabular" style="color:' + col + '">' + money(c.debt||0) + '</div>' +
+        '<div class="customer-debt-lbl">جنيه مديونية</div>' +
+      '</div>' +
+    '</div>';
+  }).join('') + '</div>';
 }
 function onDashboardSearch(v){
   state.dashboardQuery = v;
   document.getElementById('customer-list-container').innerHTML = renderCustomerListHTML();
 }
 
-/* ---- Add Customer Modal ---- */
 let newCustomerType = 'صيدلية';
 function openModal(name){ state.modal = name; if(name==='addCustomer') newCustomerType='صيدلية'; render(); }
 function closeModal(){ state.modal = null; render(); }
@@ -362,23 +422,27 @@ function renderModal(){
   if(state.modal === 'receiveStock') return renderReceiveStockModal();
   if(state.modal === 'receipt') return renderReceiptModal();
   if(state.modal === 'customerDetail') return renderCustomerDetailModal();
+  if(state.modal === 'returns') return renderReturnsModal();
+  if(state.modal === 'settings') return renderSettingsModal();
   return '';
 }
+
 function renderAddCustomerModal(){
-  return `<div class="modal-overlay" onclick="closeModal()">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="space-between">
-        <span style="font-weight:700;font-size:14px;">إضافة عميل جديد</span>
-        <button onclick="closeModal()" style="background:none;color:var(--muted);">${ICONS.x}</button>
-      </div>
-      <div class="type-toggle">
-        <button id="type-btn-صيدلية" class="${newCustomerType==='صيدلية'?'active':''}" onclick="selectCustomerType('صيدلية')">${ICONS.store}صيدلية</button>
-        <button id="type-btn-مخزن" class="${newCustomerType==='مخزن'?'active':''}" onclick="selectCustomerType('مخزن')">${ICONS.building}مخزن</button>
-      </div>
-      <input class="text-field" id="new-customer-name" placeholder="اسم الصيدلية أو المخزن" data-autofocus>
-      <button class="btn-primary" onclick="saveNewCustomer()">${ICONS.check}حفظ العميل</button>
-    </div>
-  </div>`;
+  return '<div class="modal-overlay" onclick="closeModal()">' +
+    '<div class="modal-sheet" onclick="event.stopPropagation()">' +
+      '<div class="space-between">' +
+        '<span style="font-weight:800;font-size:14px;">إضافة عميل جديد</span>' +
+        '<button onclick="closeModal()" style="background:none;color:var(--muted);">' + ICONS.x + '</button>' +
+      '</div>' +
+      '<div class="type-toggle">' +
+        '<button id="type-btn-صيدلية" class="' + (newCustomerType==='صيدلية'?'active':'') + '" onclick="selectCustomerType(\'صيدلية\')">' + ICONS.store + 'صيدلية</button>' +
+        '<button id="type-btn-مخزن" class="' + (newCustomerType==='مخزن'?'active':'') + '" onclick="selectCustomerType(\'مخزن\')">' + ICONS.building + 'مخزن</button>' +
+      '</div>' +
+      '<input class="text-field" id="new-customer-name" placeholder="اسم الصيدلية أو المخزن" data-autofocus>' +
+      '<input class="text-field" id="new-customer-phone" type="tel" placeholder="رقم الموبايل (اختياري)">' +
+      '<button class="btn-primary" onclick="saveNewCustomer()">' + ICONS.check + 'حفظ العميل</button>' +
+    '</div>' +
+  '</div>';
 }
 function selectCustomerType(t){
   newCustomerType = t;
@@ -387,14 +451,14 @@ function selectCustomerType(t){
 }
 function saveNewCustomer(){
   const name = document.getElementById('new-customer-name').value.trim();
+  const phone = document.getElementById('new-customer-phone').value.trim();
   if(!name){ toast('اكتب اسم العميل', 'error'); return; }
-  setCustomers([{ id:uid(), name, type:newCustomerType, debt:0, items:{} }, ...state.customers]);
+  setCustomers([{ id:uid(), name:name, type:newCustomerType, phone:phone, debt:0, items:{} }].concat(state.customers));
   state.modal = null;
   render();
   toast('اتضاف العميل');
 }
 
-/* ---- Customer Detail / Balance Modal ---- */
 function openCustomerDetail(id){
   state.modal = 'customerDetail';
   state.detailCustomerId = id;
@@ -404,59 +468,62 @@ function renderCustomerDetailModal(){
   const customer = state.customers.find(c=>c.id===state.detailCustomerId);
   if(!customer) return '';
   const typeIcon = customer.type === 'مخزن' ? ICONS.building : ICONS.store;
+  const col = debtColor(customer.debt||0);
   const rows = Object.entries(customer.items||{}).filter(([,q])=>q>0).map(([pid,qty])=>{
     const p = state.products.find(p=>p.id===pid);
     const price = p ? p.price : 0;
-    return { name: p ? p.name : 'صنف محذوف', qty, price, value: qty*price };
+    return { name: p ? p.name : 'صنف محذوف', qty:qty, price:price, value: qty*price };
   });
   const custHistory = state.history.filter(h=>h.customerId===customer.id).slice(0,8);
-  return `<div class="modal-overlay" onclick="closeModal()">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="space-between">
-        <div class="row-center" style="font-weight:700;font-size:15px;">${typeIcon}${escapeHtml(customer.name)}</div>
-        <button onclick="closeModal()" style="background:none;color:var(--muted);">${ICONS.x}</button>
-      </div>
-      <div class="card space-between">
-        <span style="font-size:13px;color:var(--muted);font-weight:600;">إجمالي المديونية</span>
-        <span class="tabular" style="font-size:20px;font-weight:800;color:${debtColor(customer.debt||0)};">${money(customer.debt||0)} جنيه</span>
-      </div>
-      <div class="row" style="gap:8px;">
-        <button class="btn-secondary" style="padding:9px;font-size:12px;" onclick="closeModal();setInvoiceCustomerAndGo('${customer.id}')">${ICONS.invoice}فاتورة جديدة</button>
-        <button class="btn-secondary" style="padding:9px;font-size:12px;" onclick="closeModal();setCollectCustomerAndGo('${customer.id}')">${ICONS.wallet}تحصيل منه</button>
-      </div>
-      <div>
-        <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px;">الرصيد الحالي عنده</div>
-        ${rows.length===0 ? `<div class="empty-sub" style="text-align:center;padding:14px 0;">مفيش بضاعة عنده دلوقتي</div>` : `
-        <div class="modal-list" style="max-height:180px;">${rows.map(r=>`
-          <div class="card" style="padding:9px 10px;">
-            <div class="space-between">
-              <span style="font-size:13px;font-weight:600;">${escapeHtml(r.name)}</span>
-              <span class="tabular" style="font-size:13px;font-weight:700;">${money(r.value)}</span>
-            </div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px;">${r.qty} × ${money(r.price)} جنيه</div>
-          </div>`).join('')}</div>`}
-      </div>
-      ${custHistory.length ? `<div>
-        <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px;">آخر الحركات</div>
-        <div class="modal-list" style="max-height:160px;">${custHistory.map(h=>{
-          const badgeClass = h.type==='invoice' ? 'badge-invoice' : 'badge-collect';
-          const badgeLabel = h.type==='invoice' ? 'فاتورة' : 'تحصيل';
+  return '<div class="modal-overlay" onclick="closeModal()">' +
+    '<div class="modal-sheet" onclick="event.stopPropagation()">' +
+      '<div class="space-between">' +
+        '<div class="row-center" style="font-weight:800;font-size:15px;"><span class="stamp" style="width:30px;height:30px;border-color:' + col + ';color:' + col + ';">' + typeIcon + '</span>' + escapeHtml(customer.name) + '</div>' +
+        '<button onclick="closeModal()" style="background:none;color:var(--muted);">' + ICONS.x + '</button>' +
+      '</div>' +
+      (customer.phone ? ('<a class="call-link" href="tel:' + escapeHtml(customer.phone) + '">' + ICONS.phone + 'اتصال بـ ' + escapeHtml(customer.phone) + '</a>') : '') +
+      '<div class="card space-between">' +
+        '<span style="font-size:13px;color:var(--muted);font-weight:700;">إجمالي المديونية</span>' +
+        '<span class="tabular" style="font-size:20px;font-weight:800;color:' + col + ';">' + money(customer.debt||0) + ' جنيه</span>' +
+      '</div>' +
+      '<div class="row" style="gap:8px;">' +
+        '<button class="btn-secondary" style="padding:9px;font-size:11.5px;" onclick="closeModal();setInvoiceCustomerAndGo(\'' + customer.id + '\')">' + ICONS.invoice + 'فاتورة</button>' +
+        '<button class="btn-secondary" style="padding:9px;font-size:11.5px;" onclick="closeModal();setCollectCustomerAndGo(\'' + customer.id + '\')">' + ICONS.wallet + 'تحصيل</button>' +
+        '<button class="btn-secondary" style="padding:9px;font-size:11.5px;" onclick="openReturnsFor(\'' + customer.id + '\')">' + ICONS.undo + 'مرتجع</button>' +
+      '</div>' +
+      '<div>' +
+        '<div style="font-size:11.5px;color:var(--muted);font-weight:800;margin-bottom:6px;">الرصيد الحالي عنده</div>' +
+        (rows.length===0 ? '<div class="empty-sub" style="text-align:center;padding:14px 0;">مفيش بضاعة عنده دلوقتي</div>' : (
+        '<div class="modal-list" style="max-height:170px;">' + rows.map(r=>
+          '<div class="card" style="padding:9px 10px;">' +
+            '<div class="space-between">' +
+              '<span style="font-size:13px;font-weight:700;">' + escapeHtml(r.name) + '</span>' +
+              '<span class="tabular" style="font-size:13px;font-weight:800;">' + money(r.value) + '</span>' +
+            '</div>' +
+            '<div style="font-size:11px;color:var(--muted);margin-top:2px;">' + r.qty + ' × ' + money(r.price) + ' جنيه</div>' +
+          '</div>').join('') + '</div>')) +
+      '</div>' +
+      (custHistory.length ? (
+      '<div>' +
+        '<div style="font-size:11.5px;color:var(--muted);font-weight:800;margin-bottom:6px;">آخر الحركات</div>' +
+        '<div class="modal-list" style="max-height:150px;">' + custHistory.map(h=>{
+          const badgeClass = h.type==='invoice' ? 'badge-invoice' : (h.type==='collect' ? 'badge-collect' : 'badge-return');
+          const badgeLabel = h.type==='invoice' ? 'فاتورة' : (h.type==='collect' ? 'تحصيل' : 'مرتجع');
           const dateStr = new Date(h.date).toLocaleDateString('ar-EG', {day:'numeric', month:'short'});
-          return `<div class="card row-center" style="padding:8px 10px;cursor:pointer;" onclick="openReceipt('${h.id}')">
-            <span class="badge ${badgeClass}">${badgeLabel}</span>
-            <span style="flex:1;font-size:12px;color:var(--muted);">${dateStr}</span>
-            <span class="tabular" style="font-size:13px;font-weight:700;">${money(h.total)}</span>
-            ${ICONS.eye}
-          </div>`;
-        }).join('')}</div>
-      </div>` : ''}
-    </div>
-  </div>`;
+          return '<div class="card row-center" style="padding:8px 10px;cursor:pointer;" onclick="openReceipt(\'' + h.id + '\')">' +
+            '<span class="badge ' + badgeClass + '">' + badgeLabel + '</span>' +
+            '<span style="flex:1;font-size:12px;color:var(--muted);">' + dateStr + '</span>' +
+            '<span class="tabular" style="font-size:13px;font-weight:800;">' + money(h.total) + '</span>' +
+            ICONS.eye +
+          '</div>';
+        }).join('') + '</div>'
+      + '</div>') : '') +
+    '</div>' +
+  '</div>';
 }
 function setInvoiceCustomerAndGo(id){ state.invoiceCustomerId = id; setTab('invoice'); }
 function setCollectCustomerAndGo(id){ state.collectCustomerId = id; state.collectRemaining = {}; setTab('collect'); }
 
-/* ================= INVOICE ================= */
 function renderInvoiceTab(){
   if(state.customers.length === 0){
     return emptyState(ICONS.invoice, 'محتاج تضيف عميل الأول', 'روح تبويب العملاء وضيف صيدلية أو مخزن', null, '');
@@ -468,42 +535,62 @@ function renderInvoiceTab(){
     state.invoiceCustomerId = state.customers[0].id;
   }
   const lines = cartLines();
-  const total = lines.reduce((s,l)=>s+l.subtotal,0);
+  const subtotal = lines.reduce((s,l)=>s+l.subtotal,0);
+  const pct = state.invoiceDiscountPercent || 0;
+  const discountAmount = subtotal * pct / 100;
+  const total = subtotal - discountAmount;
 
-  return `<div class="stack">
-    <div class="card">
-      <span class="field-label">العميل</span>
-      <select class="select-field" onchange="setInvoiceCustomer(this.value)">
-        ${state.customers.map(c=>`<option value="${c.id}" ${c.id===state.invoiceCustomerId?'selected':''}>${escapeHtml(c.name)}</option>`).join('')}
-      </select>
-    </div>
-    <button class="btn-secondary" onclick="openModal('productPicker')">${ICONS.plus}إضافة صنف للفاتورة</button>
-    <div class="stack" id="invoice-lines">${lines.map(l=>`
-      <div class="card line-item">
-        <div style="flex:1">
-          <div style="font-size:14px;font-weight:600;">${escapeHtml(l.name)}</div>
-          <div style="font-size:11px;color:var(--muted);">${money(l.price)} جنيه للوحدة</div>
-        </div>
-        <div class="qty-stepper">
-          <button onclick="setCartQty('${l.productId}', ${l.qty-1})">−</button>
-          <span>${l.qty}</span>
-          <button onclick="setCartQty('${l.productId}', ${l.qty+1})">+</button>
-        </div>
-        <div style="width:64px;text-align:left;font-size:14px;font-weight:700;" class="tabular">${money(l.subtotal)}</div>
-      </div>`).join('')}
-    </div>
-    ${lines.length ? `<div class="card space-between">
-      <span style="font-size:13px;color:var(--muted);font-weight:600;">الإجمالي</span>
-      <span style="font-size:18px;font-weight:800;color:var(--teal-dark);" class="tabular">${money(total)} جنيه</span>
-    </div>` : ''}
-    <button class="btn-primary" ${lines.length===0?'disabled':''} onclick="submitInvoice()">${ICONS.check}تأكيد الفاتورة</button>
-  </div>`;
+  return '<div class="stack">' +
+    '<div class="card">' +
+      '<span class="field-label">العميل</span>' +
+      '<select class="select-field" onchange="setInvoiceCustomer(this.value)">' +
+        state.customers.map(c=>'<option value="' + c.id + '" ' + (c.id===state.invoiceCustomerId?'selected':'') + '>' + escapeHtml(c.name) + '</option>').join('') +
+      '</select>' +
+    '</div>' +
+    '<button class="btn-secondary" onclick="openModal(\'productPicker\')">' + ICONS.plus + 'إضافة صنف للفاتورة</button>' +
+    '<div class="stack" id="invoice-lines">' + lines.map(l=>
+      '<div class="card line-item">' +
+        '<div style="flex:1">' +
+          '<div style="font-size:14px;font-weight:700;">' + escapeHtml(l.name) + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);">' + money(l.price) + ' جنيه للوحدة</div>' +
+        '</div>' +
+        '<div class="qty-stepper">' +
+          '<button onclick="setCartQty(\'' + l.productId + '\', ' + (l.qty-1) + ')">−</button>' +
+          '<span>' + l.qty + '</span>' +
+          '<button onclick="setCartQty(\'' + l.productId + '\', ' + (l.qty+1) + ')">+</button>' +
+        '</div>' +
+        '<div style="width:64px;text-align:left;font-size:14px;font-weight:800;" class="tabular">' + money(l.subtotal) + '</div>' +
+      '</div>').join('') +
+    '</div>' +
+    (lines.length ? (
+    '<div class="card">' +
+      '<div class="space-between">' +
+        '<span class="field-label" style="margin-bottom:0;">نسبة الخصم %</span>' +
+        '<input type="number" min="0" max="100" id="discount-input" value="' + pct + '" style="width:70px;text-align:center;background:#FAFBFA;border:1.5px solid var(--border);border-radius:9px;padding:5px;font-size:14px;font-weight:700;" oninput="onDiscountInput(this.value)">' +
+      '</div>' +
+    '</div>' +
+    '<div class="card stack" style="gap:6px;">' +
+      '<div class="space-between">' +
+        '<span style="font-size:12.5px;color:var(--muted);font-weight:600;">إجمالي قبل الخصم</span>' +
+        '<span class="tabular" id="subtotal-display" style="font-size:13px;font-weight:700;">' + money(subtotal) + '</span>' +
+      '</div>' +
+      '<div class="space-between">' +
+        '<span style="font-size:12.5px;color:var(--muted);font-weight:600;">الخصم</span>' +
+        '<span class="tabular" id="discount-display" style="font-size:13px;font-weight:700;color:var(--danger);">-' + money(discountAmount) + '</span>' +
+      '</div>' +
+      '<div class="space-between" style="border-top:1px dashed var(--border);padding-top:6px;">' +
+        '<span style="font-size:13px;color:var(--ink);font-weight:800;">الإجمالي المطلوب</span>' +
+        '<span class="tabular" id="total-display" style="font-size:18px;font-weight:800;color:var(--primary);">' + money(total) + ' جنيه</span>' +
+      '</div>' +
+    '</div>') : '') +
+    '<button class="btn-primary" ' + (lines.length===0?'disabled':'') + ' onclick="submitInvoice()">' + ICONS.check + 'تأكيد الفاتورة</button>' +
+  '</div>';
 }
 function cartLines(){
   return Object.entries(state.cart).filter(([,q])=>q>0).map(([pid,qty])=>{
     const p = state.products.find(p=>p.id===pid);
     if(!p) return null;
-    return { productId:pid, name:p.name, price:p.price, qty, subtotal: p.price*qty };
+    return { productId:pid, name:p.name, price:p.price, qty:qty, subtotal: p.price*qty };
   }).filter(Boolean);
 }
 function setInvoiceCustomer(id){ state.invoiceCustomerId = id; render(); }
@@ -511,77 +598,93 @@ function setCartQty(pid, qty){
   const p = state.products.find(p=>p.id===pid);
   const stock = p ? (p.stock || 0) : 0;
   if(qty > stock){
-    toast(`الكمية المتاحة من ${p.name} هي ${stock} بس`, 'error');
+    toast('الكمية المتاحة من ' + p.name + ' هي ' + stock + ' بس', 'error');
     qty = stock;
   }
   state.cart[pid] = Math.max(0, qty);
   render();
 }
+function onDiscountInput(v){
+  let pct = Number(v);
+  if(isNaN(pct)) pct = 0;
+  pct = Math.min(100, Math.max(0, pct));
+  state.invoiceDiscountPercent = pct;
+  const lines = cartLines();
+  const subtotal = lines.reduce((s,l)=>s+l.subtotal,0);
+  const discountAmount = subtotal * pct / 100;
+  const total = subtotal - discountAmount;
+  document.getElementById('subtotal-display').textContent = money(subtotal);
+  document.getElementById('discount-display').textContent = '-' + money(discountAmount);
+  document.getElementById('total-display').textContent = money(total) + ' جنيه';
+}
 function submitInvoice(){
   const customer = state.customers.find(c=>c.id===state.invoiceCustomerId);
   const lines = cartLines();
-  const total = lines.reduce((s,l)=>s+l.subtotal,0);
+  const subtotal = lines.reduce((s,l)=>s+l.subtotal,0);
+  const pct = state.invoiceDiscountPercent || 0;
+  const discountAmount = subtotal * pct / 100;
+  const total = subtotal - discountAmount;
   if(!customer){ toast('اختار عميل الأول','error'); return; }
   if(lines.length===0){ toast('ضيف صنف واحد على الأقل','error'); return; }
   for(const l of lines){
     const p = state.products.find(p=>p.id===l.productId);
     const stock = p ? (p.stock || 0) : 0;
     if(l.qty > stock){
-      toast(`الكمية المتاحة من ${l.name} هي ${stock} بس`, 'error');
+      toast('الكمية المتاحة من ' + l.name + ' هي ' + stock + ' بس', 'error');
       return;
     }
   }
   const nextProducts = state.products.map(p=>{
     const l = lines.find(l=>l.productId===p.id);
-    return l ? {...p, stock:(p.stock||0)-l.qty} : p;
+    return l ? Object.assign({}, p, {stock:(p.stock||0)-l.qty}) : p;
   });
   const nextCustomers = state.customers.map(c=>{
     if(c.id!==customer.id) return c;
-    const items = {...(c.items||{})};
+    const items = Object.assign({}, c.items||{});
     lines.forEach(l=>{ items[l.productId] = (items[l.productId]||0) + l.qty; });
-    return {...c, items, debt:(c.debt||0)+total};
+    return Object.assign({}, c, {items:items, debt:(c.debt||0)+total});
   });
   setProducts(nextProducts);
   setCustomers(nextCustomers);
-  const record = { id:uid(), type:'invoice', customerId:customer.id, customerName:customer.name, date:new Date().toISOString(), lines, total };
-  setHistory([record, ...state.history]);
+  const record = { id:uid(), type:'invoice', customerId:customer.id, customerName:customer.name, date:new Date().toISOString(), lines:lines, subtotal:subtotal, discountPercent:pct, discountAmount:discountAmount, total:total };
+  setHistory([record].concat(state.history));
   state.cart = {};
+  state.invoiceDiscountPercent = 0;
   state.previewRecord = record;
   state.modal = 'receipt';
   render();
 }
 
-/* ---- Product Picker Modal ---- */
 function renderProductPickerModal(){
-  return `<div class="modal-overlay" onclick="closeModal()">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="row-center">
-        ${ICONS.search}
-        <input style="flex:1;border:none;outline:none;font-size:14px;" placeholder="دور على صنف" value="${escapeHtml(state.pickerQuery)}" oninput="onPickerSearch(this.value)" data-autofocus>
-        <button onclick="closeModal()" style="background:none;color:var(--muted);">${ICONS.x}</button>
-      </div>
-      <div class="modal-list" id="picker-list">${renderPickerListHTML()}</div>
-      <button class="btn-primary" onclick="closeModal()">تم</button>
-    </div>
-  </div>`;
+  return '<div class="modal-overlay" onclick="closeModal()">' +
+    '<div class="modal-sheet" onclick="event.stopPropagation()">' +
+      '<div class="row-center">' +
+        ICONS.search +
+        '<input style="flex:1;border:none;outline:none;font-size:14px;" placeholder="دور على صنف" value="' + escapeHtml(state.pickerQuery) + '" oninput="onPickerSearch(this.value)" data-autofocus>' +
+        '<button onclick="closeModal()" style="background:none;color:var(--muted);">' + ICONS.x + '</button>' +
+      '</div>' +
+      '<div class="modal-list" id="picker-list">' + renderPickerListHTML() + '</div>' +
+      '<button class="btn-primary" onclick="closeModal()">تم</button>' +
+    '</div>' +
+  '</div>';
 }
 function renderPickerListHTML(){
   const list = state.products.filter(p=>p.name.includes(state.pickerQuery));
-  if(list.length===0) return `<div class="empty-sub" style="text-align:center;padding:20px 0;">مفيش نتائج</div>`;
+  if(list.length===0) return '<div class="empty-sub" style="text-align:center;padding:20px 0;">مفيش نتائج</div>';
   return list.map(p=>{
     const qty = state.cart[p.id] || 0;
     const stock = p.stock || 0;
-    return `<div class="row-center" style="padding:6px 2px;">
-      <div style="flex:1">
-        <div style="font-size:14px;font-weight:500;">${escapeHtml(p.name)}</div>
-        <div style="font-size:11px;color:var(--muted);">${money(p.price)} جنيه · المتاح ${stock}</div>
-      </div>
-      <div class="qty-stepper">
-        <button onclick="setCartQtyLive('${p.id}', ${qty-1})">−</button>
-        <span>${qty}</span>
-        <button onclick="setCartQtyLive('${p.id}', ${qty+1})">+</button>
-      </div>
-    </div>`;
+    return '<div class="row-center" style="padding:6px 2px;">' +
+      '<div style="flex:1">' +
+        '<div style="font-size:14px;font-weight:600;">' + escapeHtml(p.name) + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);">' + money(p.price) + ' جنيه · المتاح ' + stock + '</div>' +
+      '</div>' +
+      '<div class="qty-stepper">' +
+        '<button onclick="setCartQtyLive(\'' + p.id + '\', ' + (qty-1) + ')">−</button>' +
+        '<span>' + qty + '</span>' +
+        '<button onclick="setCartQtyLive(\'' + p.id + '\', ' + (qty+1) + ')">+</button>' +
+      '</div>' +
+    '</div>';
   }).join('');
 }
 function onPickerSearch(v){
@@ -592,14 +695,13 @@ function setCartQtyLive(pid, qty){
   const p = state.products.find(p=>p.id===pid);
   const stock = p ? (p.stock || 0) : 0;
   if(qty > stock){
-    toast(`الكمية المتاحة من ${p.name} هي ${stock} بس`, 'error');
+    toast('الكمية المتاحة من ' + p.name + ' هي ' + stock + ' بس', 'error');
     qty = stock;
   }
   state.cart[pid] = Math.max(0, qty);
   document.getElementById('picker-list').innerHTML = renderPickerListHTML();
 }
 
-/* ---- Receipt / Preview Modal (invoice + collection) ---- */
 function openReceipt(historyId){
   const record = state.history.find(h=>h.id===historyId);
   if(!record) return;
@@ -610,59 +712,70 @@ function openReceipt(historyId){
 function renderReceiptModal(){
   const r = state.previewRecord;
   if(!r) return '';
-  const isInvoice = r.type === 'invoice';
-  const title = isInvoice ? 'فاتورة توريد' : 'إيصال تحصيل';
-  const color = isInvoice ? 'var(--teal-dark)' : '#8A5A1F';
+  const titles = { invoice:'فاتورة توريد', collect:'إيصال تحصيل', return:'إيصال مرتجع' };
+  const colors = { invoice:'var(--primary)', collect:'var(--accent-dark)', return:'var(--danger)' };
+  const totalLabels = { invoice:'إجمالي الفاتورة', collect:'إجمالي المحصّل', return:'إجمالي المرتجع' };
+  const title = titles[r.type] || 'إيصال';
+  const color = colors[r.type] || 'var(--primary)';
   const dateStr = new Date(r.date).toLocaleDateString('ar-EG', {day:'numeric', month:'long', year:'numeric'});
   const timeStr = new Date(r.date).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
   const rows = r.lines.map(l => ({
     name: l.name,
     qty: l.qty !== undefined ? l.qty : l.sold,
     price: l.price,
-    amount: l.subtotal !== undefined ? l.subtotal : l.value,
+    amount: l.subtotal !== undefined ? l.subtotal : (l.value !== undefined ? l.value : l.amount),
   }));
-  return `<div class="modal-overlay" onclick="closeModal()">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="space-between no-print">
-        <span style="font-weight:700;font-size:14px;">معاينة ${isInvoice?'الفاتورة':'التحصيل'}</span>
-        <button onclick="closeModal()" style="background:none;color:var(--muted);">${ICONS.x}</button>
-      </div>
-      <div class="receipt-paper">
-        <div style="text-align:center;">
-          <div style="font-weight:800;font-size:16px;color:${color};">${title}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${dateStr} — ${timeStr}</div>
-        </div>
-        <div class="receipt-divider"></div>
-        <div class="space-between" style="margin-bottom:8px;">
-          <span style="font-size:12px;color:var(--muted);">العميل</span>
-          <span style="font-size:13px;font-weight:700;">${escapeHtml(r.customerName)}</span>
-        </div>
-        <div class="receipt-table">
-          <div class="receipt-row receipt-head">
-            <span style="flex:1;">الصنف</span><span style="width:34px;text-align:center;">الكمية</span><span style="width:56px;text-align:left;">السعر</span><span style="width:64px;text-align:left;">الإجمالي</span>
-          </div>
-          ${rows.map(row=>`<div class="receipt-row">
-            <span style="flex:1;">${escapeHtml(row.name)}</span>
-            <span style="width:34px;text-align:center;" class="tabular">${row.qty}</span>
-            <span style="width:56px;text-align:left;" class="tabular">${money(row.price)}</span>
-            <span style="width:64px;text-align:left;" class="tabular">${money(row.amount)}</span>
-          </div>`).join('')}
-        </div>
-        <div class="receipt-divider"></div>
-        <div class="space-between">
-          <span style="font-weight:700;font-size:13px;">${isInvoice ? 'إجمالي الفاتورة' : 'إجمالي المحصّل'}</span>
-          <span class="tabular" style="font-weight:800;font-size:17px;color:${color};">${money(r.total)} جنيه</span>
-        </div>
-      </div>
-      <div class="row no-print" style="gap:8px;">
-        <button class="btn-secondary" style="flex:1;" onclick="window.print()">${ICONS.printer}طباعة / حفظ PDF</button>
-        <button class="btn-primary" style="flex:1;" onclick="closeModal()">${ICONS.check}تم</button>
-      </div>
-    </div>
-  </div>`;
+  return '<div class="modal-overlay" onclick="closeModal()">' +
+    '<div class="modal-sheet" onclick="event.stopPropagation()">' +
+      '<div class="space-between no-print">' +
+        '<span style="font-weight:800;font-size:14px;">معاينة ' + title + '</span>' +
+        '<button onclick="closeModal()" style="background:none;color:var(--muted);">' + ICONS.x + '</button>' +
+      '</div>' +
+      '<div class="receipt-paper">' +
+        '<div style="text-align:center;">' +
+          '<div style="font-weight:800;font-size:16px;color:' + color + ';">' + title + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:2px;">' + dateStr + ' — ' + timeStr + '</div>' +
+        '</div>' +
+        '<div class="receipt-divider"></div>' +
+        '<div class="space-between" style="margin-bottom:8px;">' +
+          '<span style="font-size:12px;color:var(--muted);">العميل</span>' +
+          '<span style="font-size:13px;font-weight:800;">' + escapeHtml(r.customerName) + '</span>' +
+        '</div>' +
+        '<div class="receipt-table">' +
+          '<div class="receipt-row receipt-head">' +
+            '<span style="flex:1;">الصنف</span><span style="width:34px;text-align:center;">الكمية</span><span style="width:56px;text-align:left;">السعر</span><span style="width:64px;text-align:left;">الإجمالي</span>' +
+          '</div>' +
+          rows.map(row=>
+            '<div class="receipt-row">' +
+              '<span style="flex:1;">' + escapeHtml(row.name) + '</span>' +
+              '<span style="width:34px;text-align:center;" class="tabular">' + row.qty + '</span>' +
+              '<span style="width:56px;text-align:left;" class="tabular">' + money(row.price) + '</span>' +
+              '<span style="width:64px;text-align:left;" class="tabular">' + money(row.amount) + '</span>' +
+            '</div>').join('') +
+        '</div>' +
+        '<div class="receipt-divider"></div>' +
+        (r.discountPercent ? (
+        '<div class="space-between" style="margin-bottom:4px;">' +
+          '<span style="font-size:12px;color:var(--muted);">الإجمالي قبل الخصم</span>' +
+          '<span class="tabular" style="font-size:12.5px;font-weight:700;">' + money(r.subtotal) + '</span>' +
+        '</div>' +
+        '<div class="space-between" style="margin-bottom:8px;">' +
+          '<span style="font-size:12px;color:var(--muted);">الخصم (' + r.discountPercent + '%)</span>' +
+          '<span class="tabular" style="font-size:12.5px;font-weight:700;color:var(--danger);">-' + money(r.discountAmount) + '</span>' +
+        '</div>') : '') +
+        '<div class="space-between">' +
+          '<span style="font-weight:800;font-size:13px;">' + (totalLabels[r.type] || 'الإجمالي') + '</span>' +
+          '<span class="tabular" style="font-weight:800;font-size:17px;color:' + color + ';">' + money(r.total) + ' جنيه</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="row no-print" style="gap:8px;">' +
+        '<button class="btn-secondary" style="flex:1;" onclick="window.print()">' + ICONS.printer + 'طباعة / حفظ PDF</button>' +
+        '<button class="btn-primary" style="flex:1;" onclick="closeModal()">' + ICONS.check + 'تم</button>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
 }
 
-/* ================= COLLECT ================= */
 function customersWithStock(){
   return state.customers.filter(c=>Object.values(c.items||{}).some(q=>q>0));
 }
@@ -682,49 +795,48 @@ function renderCollectTab(){
   const lines = collectLines(customer);
   const total = lines.reduce((s,l)=>s+l.value,0);
 
-  return `<div class="stack">
-    <div class="card">
-      <span class="field-label">العميل</span>
-      <select class="select-field" onchange="setCollectCustomer(this.value)">
-        ${withStock.map(c=>`<option value="${c.id}" ${c.id===customer.id?'selected':''}>${escapeHtml(c.name)}</option>`).join('')}
-      </select>
-    </div>
-    <div class="alert-box">${ICONS.alert}<div>اكتب الرصيد الفعلي الموجود عند العميل دلوقتي لكل صنف، والبرنامج هيحسبلك اللي اتباع واللي المفروض تحصله.</div></div>
-    <div class="stack" id="collect-lines">${lines.map(l=>renderCollectLineHTML(l)).join('')}</div>
-    <div class="card space-between">
-      <span style="font-size:13px;color:var(--muted);font-weight:600;">المبلغ المطلوب تحصيله</span>
-      <span id="collect-total" style="font-size:18px;font-weight:800;color:var(--teal-dark);" class="tabular">${money(total)} جنيه</span>
-    </div>
-    <button class="btn-primary" onclick="confirmCollection()">${ICONS.check}تأكيد التحصيل</button>
-  </div>`;
+  return '<div class="stack">' +
+    '<div class="card">' +
+      '<span class="field-label">العميل</span>' +
+      '<select class="select-field" onchange="setCollectCustomer(this.value)">' +
+        withStock.map(c=>'<option value="' + c.id + '" ' + (c.id===customer.id?'selected':'') + '>' + escapeHtml(c.name) + '</option>').join('') +
+      '</select>' +
+    '</div>' +
+    '<div class="alert-box">' + ICONS.alert + '<div>اكتب الرصيد الفعلي الموجود عند العميل دلوقتي لكل صنف، والبرنامج هيحسبلك اللي اتباع واللي المفروض تحصله.</div></div>' +
+    '<div class="stack" id="collect-lines">' + lines.map(l=>renderCollectLineHTML(l)).join('') + '</div>' +
+    '<div class="card space-between">' +
+      '<span style="font-size:13px;color:var(--muted);font-weight:700;">المبلغ المطلوب تحصيله</span>' +
+      '<span id="collect-total" style="font-size:18px;font-weight:800;color:var(--primary);" class="tabular">' + money(total) + ' جنيه</span>' +
+    '</div>' +
+    '<button class="btn-primary" onclick="confirmCollection()">' + ICONS.check + 'تأكيد التحصيل</button>' +
+  '</div>';
 }
 function collectLines(customer){
   return Object.entries(customer.items||{}).filter(([,q])=>q>0).map(([pid,currentQty])=>{
     const p = state.products.find(p=>p.id===pid);
     const rem = state.collectRemaining[pid] !== undefined ? state.collectRemaining[pid] : currentQty;
     const sold = Math.max(0, currentQty - rem);
-    return { productId:pid, name: p ? p.name : 'صنف محذوف', price: p ? p.price : 0, currentQty, remaining:rem, sold, value: sold * (p ? p.price : 0) };
+    return { productId:pid, name: p ? p.name : 'صنف محذوف', price: p ? p.price : 0, currentQty:currentQty, remaining:rem, sold:sold, value: sold * (p ? p.price : 0) };
   });
 }
 function renderCollectLineHTML(l){
-  return `<div class="card" id="collect-row-${l.productId}">
-    <div class="space-between" style="margin-bottom:8px;">
-      <div>
-        <div style="font-size:14px;font-weight:600;">${escapeHtml(l.name)}</div>
-        <div style="font-size:11px;color:var(--muted);">عنده ${l.currentQty} × ${money(l.price)} جنيه</div>
-      </div>
-      <div style="text-align:left;">
-        <div style="font-size:11px;color:var(--muted);">المباع</div>
-        <div class="tabular" id="sold-${l.productId}" style="font-weight:700;color:${l.sold>0?'var(--teal-dark)':'#B7C0B5'};">${l.sold}</div>
-      </div>
-    </div>
-    <div class="row-center">
-      <label style="font-size:12px;color:var(--muted);flex-shrink:0;">الرصيد الحالي عنده</label>
-      <input type="number" min="0" max="${l.currentQty}" class="num-input" id="remaining-${l.productId}" value="${l.remaining}"
-        oninput="onRemainingInput('${l.productId}', ${l.currentQty}, ${l.price})">
-      <div style="width:80px;text-align:left;font-size:14px;font-weight:700;flex-shrink:0;" class="tabular" id="value-${l.productId}">${money(l.value)}</div>
-    </div>
-  </div>`;
+  return '<div class="card" id="collect-row-' + l.productId + '">' +
+    '<div class="space-between" style="margin-bottom:8px;">' +
+      '<div>' +
+        '<div style="font-size:14px;font-weight:700;">' + escapeHtml(l.name) + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);">عنده ' + l.currentQty + ' × ' + money(l.price) + ' جنيه</div>' +
+      '</div>' +
+      '<div style="text-align:left;">' +
+        '<div style="font-size:11px;color:var(--muted);">المباع</div>' +
+        '<div class="tabular" id="sold-' + l.productId + '" style="font-weight:800;color:' + (l.sold>0?'var(--primary)':'#B7C0B5') + ';">' + l.sold + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="row-center">' +
+      '<label style="font-size:12px;color:var(--muted);flex-shrink:0;">الرصيد الحالي عنده</label>' +
+      '<input type="number" min="0" max="' + l.currentQty + '" class="num-input" id="remaining-' + l.productId + '" value="' + l.remaining + '" oninput="onRemainingInput(\'' + l.productId + '\', ' + l.currentQty + ', ' + l.price + ')">' +
+      '<div style="width:80px;text-align:left;font-size:14px;font-weight:800;flex-shrink:0;" class="tabular" id="value-' + l.productId + '">' + money(l.value) + '</div>' +
+    '</div>' +
+  '</div>';
 }
 function setCollectCustomer(id){
   state.collectCustomerId = id;
@@ -739,7 +851,7 @@ function onRemainingInput(pid, currentQty, price){
   const sold = Math.max(0, currentQty - v);
   const value = sold * price;
   document.getElementById('sold-'+pid).textContent = sold;
-  document.getElementById('sold-'+pid).style.color = sold > 0 ? 'var(--teal-dark)' : '#B7C0B5';
+  document.getElementById('sold-'+pid).style.color = sold > 0 ? 'var(--primary)' : '#B7C0B5';
   document.getElementById('value-'+pid).textContent = money(value);
   const customer = state.customers.find(c=>c.id===state.collectCustomerId);
   const total = collectLines(customer).reduce((s,l)=>s+l.value,0);
@@ -752,56 +864,140 @@ function confirmCollection(){
   if(total <= 0){ toast('مفيش مبلغ للتحصيل، راجع الأرصدة', 'error'); return; }
   const nextCustomers = state.customers.map(c=>{
     if(c.id!==customer.id) return c;
-    const items = {...c.items};
+    const items = Object.assign({}, c.items);
     lines.forEach(l=>{ items[l.productId] = l.remaining; });
-    return {...c, items, debt: Math.max(0, (c.debt||0)-total)};
+    return Object.assign({}, c, {items:items, debt: Math.max(0, (c.debt||0)-total)});
   });
   setCustomers(nextCustomers);
-  const record = { id:uid(), type:'collect', customerId:customer.id, customerName:customer.name, date:new Date().toISOString(), lines: lines.filter(l=>l.sold>0), total };
-  setHistory([record, ...state.history]);
+  const record = { id:uid(), type:'collect', customerId:customer.id, customerName:customer.name, date:new Date().toISOString(), lines: lines.filter(l=>l.sold>0), total:total };
+  setHistory([record].concat(state.history));
   state.collectRemaining = {};
   state.previewRecord = record;
   state.modal = 'receipt';
   render();
 }
 
-/* ================= PRODUCTS ================= */
+function openReturnsFor(customerId){
+  state.modal = 'returns';
+  state.returnCustomerId = customerId;
+  state.returnQty = {};
+  render();
+}
+function returnLines(customer){
+  return Object.entries(customer.items||{}).filter(([,q])=>q>0).map(([pid,currentQty])=>{
+    const p = state.products.find(p=>p.id===pid);
+    const qty = state.returnQty[pid] || 0;
+    return { productId:pid, name: p ? p.name : 'صنف محذوف', price: p ? p.price : 0, currentQty:currentQty, qty:qty, amount: qty * (p ? p.price : 0) };
+  });
+}
+function renderReturnsModal(){
+  const customer = state.customers.find(c=>c.id===state.returnCustomerId);
+  if(!customer) return '';
+  const lines = returnLines(customer);
+  const total = lines.reduce((s,l)=>s+l.amount,0);
+  return '<div class="modal-overlay" onclick="closeModal()">' +
+    '<div class="modal-sheet" onclick="event.stopPropagation()">' +
+      '<div class="space-between">' +
+        '<span style="font-weight:800;font-size:14px;">تسجيل مرتجع: ' + escapeHtml(customer.name) + '</span>' +
+        '<button onclick="closeModal()" style="background:none;color:var(--muted);">' + ICONS.x + '</button>' +
+      '</div>' +
+      (lines.length===0 ? '<div class="empty-sub" style="text-align:center;padding:14px 0;">مفيش بضاعة عند العميل ده يترجّع</div>' : (
+      '<div class="alert-box">' + ICONS.alert + '<div>اكتب كمية كل صنف هترجع منه. هيترد للمخزون وتتخصم قيمته من مديونية العميل.</div></div>' +
+      '<div class="stack" id="return-lines">' + lines.map(l=>
+        '<div class="card" id="return-row-' + l.productId + '">' +
+          '<div class="space-between" style="margin-bottom:8px;">' +
+            '<div>' +
+              '<div style="font-size:14px;font-weight:700;">' + escapeHtml(l.name) + '</div>' +
+              '<div style="font-size:11px;color:var(--muted);">عنده ' + l.currentQty + ' × ' + money(l.price) + ' جنيه</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="row-center">' +
+            '<label style="font-size:12px;color:var(--muted);flex-shrink:0;">الكمية المرتجعة</label>' +
+            '<input type="number" min="0" max="' + l.currentQty + '" class="num-input" id="return-qty-' + l.productId + '" value="' + l.qty + '" oninput="onReturnQtyInput(\'' + l.productId + '\', ' + l.currentQty + ', ' + l.price + ')">' +
+            '<div style="width:80px;text-align:left;font-size:14px;font-weight:800;flex-shrink:0;" class="tabular" id="return-amount-' + l.productId + '">' + money(l.amount) + '</div>' +
+          '</div>' +
+        '</div>').join('') +
+      '</div>' +
+      '<div class="card space-between">' +
+        '<span style="font-size:13px;color:var(--muted);font-weight:700;">إجمالي المرتجع</span>' +
+        '<span id="return-total" style="font-size:18px;font-weight:800;color:var(--danger);" class="tabular">' + money(total) + ' جنيه</span>' +
+      '</div>' +
+      '<button class="btn-primary btn-danger" onclick="confirmReturn()">' + ICONS.undo + 'تأكيد المرتجع</button>')) +
+    '</div>' +
+  '</div>';
+}
+function onReturnQtyInput(pid, currentQty, price){
+  let v = Number(document.getElementById('return-qty-'+pid).value);
+  if(isNaN(v)) v = 0;
+  v = Math.min(Math.max(0, v), currentQty);
+  state.returnQty[pid] = v;
+  const amount = v * price;
+  document.getElementById('return-amount-'+pid).textContent = money(amount);
+  const customer = state.customers.find(c=>c.id===state.returnCustomerId);
+  const total = returnLines(customer).reduce((s,l)=>s+l.amount,0);
+  document.getElementById('return-total').textContent = money(total) + ' جنيه';
+}
+function confirmReturn(){
+  const customer = state.customers.find(c=>c.id===state.returnCustomerId);
+  const lines = returnLines(customer).filter(l=>l.qty>0);
+  const total = lines.reduce((s,l)=>s+l.amount,0);
+  if(lines.length===0){ toast('حدد كمية المرتجع الأول', 'error'); return; }
+  const nextCustomers = state.customers.map(c=>{
+    if(c.id!==customer.id) return c;
+    const items = Object.assign({}, c.items);
+    lines.forEach(l=>{ items[l.productId] = Math.max(0, (items[l.productId]||0) - l.qty); });
+    return Object.assign({}, c, {items:items, debt: Math.max(0, (c.debt||0)-total)});
+  });
+  const nextProducts = state.products.map(p=>{
+    const l = lines.find(l=>l.productId===p.id);
+    return l ? Object.assign({}, p, {stock:(p.stock||0)+l.qty}) : p;
+  });
+  setCustomers(nextCustomers);
+  setProducts(nextProducts);
+  const record = { id:uid(), type:'return', customerId:customer.id, customerName:customer.name, date:new Date().toISOString(), lines:lines, total:total };
+  setHistory([record].concat(state.history));
+  state.returnQty = {};
+  state.previewRecord = record;
+  state.modal = 'receipt';
+  render();
+}
+
 function stockClass(stock){
   if(stock<=0) return 'stock-out';
   if(stock<10) return 'stock-low';
   return 'stock-ok';
 }
 function renderProductsTab(){
-  return `<div class="stack">
-    <div class="card stack">
-      <div style="font-size:14px;font-weight:700;">إضافة صنف جديد</div>
-      <input class="text-field" id="new-product-name" placeholder="اسم الصنف">
-      <input class="text-field" id="new-product-price" type="number" placeholder="السعر بالجنيه">
-      <input class="text-field" id="new-product-stock" type="number" placeholder="الكمية الحالية معاك (اختياري)">
-      <button class="btn-primary" onclick="addProduct()">إضافة</button>
-    </div>
-    ${state.products.length===0
+  return '<div class="stack">' +
+    '<div class="card stack">' +
+      '<div style="font-size:14px;font-weight:800;">إضافة صنف جديد</div>' +
+      '<input class="text-field" id="new-product-name" placeholder="اسم الصنف">' +
+      '<input class="text-field" id="new-product-price" type="number" placeholder="السعر بالجنيه">' +
+      '<input class="text-field" id="new-product-stock" type="number" placeholder="الكمية الحالية معاك (اختياري)">' +
+      '<button class="btn-primary" onclick="addProduct()">إضافة</button>' +
+    '</div>' +
+    (state.products.length===0
       ? emptyState(ICONS.package, 'مفيش أصناف لسه', 'ضيف اسم الصنف وسعره فوق', null, '')
-      : `<div class="stack">${state.products.map(p=>{
+      : ('<div class="stack">' + state.products.map(p=>{
         const stock = p.stock || 0;
-        return `<div class="card row-center">
-          <div style="flex:1">
-            <div style="font-size:14px;font-weight:600;">${escapeHtml(p.name)}</div>
-            <div style="font-size:11px;color:var(--muted);">${money(p.price)} جنيه</div>
-          </div>
-          <span class="stock-badge ${stockClass(stock)}">${stock} بالمخزون</span>
-          <button class="receive-btn" onclick="openReceiveStock('${p.id}')">${ICONS.boxes}استلام</button>
-          <button class="trash-btn" onclick="removeProduct('${p.id}')">${ICONS.trash}</button>
-        </div>`;
-      }).join('')}</div>`}
-  </div>`;
+        return '<div class="card row-center">' +
+          '<div style="flex:1">' +
+            '<div style="font-size:14px;font-weight:700;">' + escapeHtml(p.name) + '</div>' +
+            '<div style="font-size:11px;color:var(--muted);">' + money(p.price) + ' جنيه</div>' +
+          '</div>' +
+          '<span class="stock-badge ' + stockClass(stock) + '">' + stock + ' بالمخزون</span>' +
+          '<button class="receive-btn" onclick="openReceiveStock(\'' + p.id + '\')">' + ICONS.boxes + 'استلام</button>' +
+          '<button class="trash-btn" onclick="removeProduct(\'' + p.id + '\')">' + ICONS.trash + '</button>' +
+        '</div>';
+      }).join('') + '</div>')) +
+  '</div>';
 }
 function addProduct(){
   const name = document.getElementById('new-product-name').value.trim();
   const price = Number(document.getElementById('new-product-price').value);
   const stock = Number(document.getElementById('new-product-stock').value) || 0;
   if(!name || !price || price<=0){ toast('اكتب اسم الصنف والسعر', 'error'); return; }
-  setProducts([{ id:uid(), name, price, stock }, ...state.products]);
+  setProducts([{ id:uid(), name:name, price:price, stock:stock }].concat(state.products));
   render();
   toast('اتضاف الصنف');
 }
@@ -810,7 +1006,6 @@ function removeProduct(id){
   render();
 }
 
-/* ---- Receive Stock Modal ---- */
 function openReceiveStock(productId){
   state.modal = 'receiveStock';
   state.receiveProductId = productId;
@@ -819,63 +1014,126 @@ function openReceiveStock(productId){
 function renderReceiveStockModal(){
   const p = state.products.find(p=>p.id===state.receiveProductId);
   if(!p) return '';
-  return `<div class="modal-overlay" onclick="closeModal()">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="space-between">
-        <span style="font-weight:700;font-size:14px;">استلام مخزون: ${escapeHtml(p.name)}</span>
-        <button onclick="closeModal()" style="background:none;color:var(--muted);">${ICONS.x}</button>
-      </div>
-      <div class="card space-between">
-        <span style="font-size:12px;color:var(--muted);">الكمية الحالية بالمخزون</span>
-        <span class="tabular" style="font-weight:700;">${p.stock||0}</span>
-      </div>
-      <input class="text-field" id="receive-qty" type="number" placeholder="الكمية اللي هتستلمها" data-autofocus>
-      <button class="btn-primary" onclick="confirmReceiveStock()">${ICONS.check}تأكيد الاستلام</button>
-    </div>
-  </div>`;
+  return '<div class="modal-overlay" onclick="closeModal()">' +
+    '<div class="modal-sheet" onclick="event.stopPropagation()">' +
+      '<div class="space-between">' +
+        '<span style="font-weight:800;font-size:14px;">استلام مخزون: ' + escapeHtml(p.name) + '</span>' +
+        '<button onclick="closeModal()" style="background:none;color:var(--muted);">' + ICONS.x + '</button>' +
+      '</div>' +
+      '<div class="card space-between">' +
+        '<span style="font-size:12px;color:var(--muted);">الكمية الحالية بالمخزون</span>' +
+        '<span class="tabular" style="font-weight:800;">' + (p.stock||0) + '</span>' +
+      '</div>' +
+      '<input class="text-field" id="receive-qty" type="number" placeholder="الكمية اللي هتستلمها" data-autofocus>' +
+      '<button class="btn-primary" onclick="confirmReceiveStock()">' + ICONS.check + 'تأكيد الاستلام</button>' +
+    '</div>' +
+  '</div>';
 }
 function confirmReceiveStock(){
   const qty = Number(document.getElementById('receive-qty').value);
   if(!qty || qty<=0){ toast('اكتب كمية صحيحة', 'error'); return; }
   const nextProducts = state.products.map(p=>
-    p.id === state.receiveProductId ? {...p, stock:(p.stock||0)+qty} : p
+    p.id === state.receiveProductId ? Object.assign({}, p, {stock:(p.stock||0)+qty}) : p
   );
   setProducts(nextProducts);
   state.modal = null;
   render();
-  toast(`اتضاف ${qty} للمخزون`);
+  toast('اتضاف ' + qty + ' للمخزون');
 }
 
-/* ================= HISTORY ================= */
 function renderHistoryTab(){
   if(state.history.length===0){
     return emptyState(ICONS.history, 'مفيش حركات لسه', 'الفواتير والتحصيلات هتظهر هنا', null, '');
   }
-  return `<div class="stack">${state.history.map(h=>{
+  const badgeMeta = {
+    invoice: {cls:'badge-invoice', label:'فاتورة', color:'var(--primary)'},
+    collect: {cls:'badge-collect', label:'تحصيل', color:'var(--accent-dark)'},
+    return: {cls:'badge-return', label:'مرتجع', color:'var(--danger)'},
+  };
+  return '<div class="stack">' + state.history.map(h=>{
     const dateStr = new Date(h.date).toLocaleDateString('ar-EG', {day:'numeric', month:'short'});
-    const badgeClass = h.type==='invoice' ? 'badge-invoice' : 'badge-collect';
-    const badgeLabel = h.type==='invoice' ? 'فاتورة' : 'تحصيل';
-    const color = h.type==='invoice' ? 'var(--teal-dark)' : '#8A5A1F';
-    const linesHtml = h.lines.map(l=>`<span style="font-size:11px;color:var(--muted);">${escapeHtml(l.name)} ×${l.qty ?? l.sold}</span>`).join(' ');
-    return `<div class="card">
-      <div class="space-between">
-        <div class="row-center"><span class="badge ${badgeClass}">${badgeLabel}</span><span style="font-size:14px;font-weight:600;">${escapeHtml(h.customerName)}</span></div>
-        <div class="row-center">
-          <span style="font-size:11px;color:var(--muted);">${dateStr}</span>
-          <button style="background:none;color:var(--muted);padding:2px;" onclick="openReceipt('${h.id}')">${ICONS.eye}</button>
-        </div>
-      </div>
-      <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;">${linesHtml}</div>
-      <div style="margin-top:6px;text-align:left;font-weight:700;color:${color};" class="tabular">${money(h.total)} جنيه</div>
-    </div>`;
-  }).join('')}</div>`;
+    const meta = badgeMeta[h.type] || badgeMeta.invoice;
+    const linesHtml = h.lines.map(l=>'<span style="font-size:11px;color:var(--muted);">' + escapeHtml(l.name) + ' ×' + (l.qty !== undefined ? l.qty : l.sold) + '</span>').join(' ');
+    return '<div class="card">' +
+      '<div class="space-between">' +
+        '<div class="row-center"><span class="badge ' + meta.cls + '">' + meta.label + '</span><span style="font-size:14px;font-weight:700;">' + escapeHtml(h.customerName) + '</span></div>' +
+        '<div class="row-center">' +
+          '<span style="font-size:11px;color:var(--muted);">' + dateStr + '</span>' +
+          '<button style="background:none;color:var(--muted);padding:2px;" onclick="openReceipt(\'' + h.id + '\')">' + ICONS.eye + '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;">' + linesHtml + '</div>' +
+      '<div style="margin-top:6px;text-align:left;font-weight:800;color:' + meta.color + ';" class="tabular">' + money(h.total) + ' جنيه</div>' +
+    '</div>';
+  }).join('') + '</div>';
 }
 
-/* ================= INIT ================= */
+function renderSettingsModal(){
+  return '<div class="modal-overlay" onclick="closeModal()">' +
+    '<div class="modal-sheet" onclick="event.stopPropagation()">' +
+      '<div class="space-between">' +
+        '<span style="font-weight:800;font-size:14px;">الإعدادات والنسخ الاحتياطي</span>' +
+        '<button onclick="closeModal()" style="background:none;color:var(--muted);">' + ICONS.x + '</button>' +
+      '</div>' +
+      '<button class="settings-row" onclick="exportBackup()">' + ICONS.download + '<span style="flex:1;text-align:right;">تصدير نسخة احتياطية</span></button>' +
+      '<button class="settings-row" onclick="document.getElementById(\'import-file-input\').click()">' + ICONS.upload + '<span style="flex:1;text-align:right;">استيراد نسخة احتياطية</span></button>' +
+      '<button class="settings-row" style="background:#FBEAEA;color:var(--danger);" onclick="clearAllData()">' + ICONS.trash + '<span style="flex:1;text-align:right;color:var(--danger);">مسح كل البيانات</span></button>' +
+      '<div class="empty-sub" style="text-align:center;">البيانات محفوظة على الجهاز ده بس. صدّر نسخة احتياطية بانتظام عشان متفقدش بياناتك.</div>' +
+    '</div>' +
+  '</div>';
+}
+function exportBackup(){
+  const payload = { products: state.products, customers: state.customers, history: state.history, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = 'mandoub-backup-' + stamp + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('اتنزلت النسخة الاحتياطية');
+}
+document.getElementById('import-file-input').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    try{
+      const data = JSON.parse(evt.target.result);
+      if(!Array.isArray(data.products) || !Array.isArray(data.customers) || !Array.isArray(data.history)){
+        toast('الملف ده مش نسخة احتياطية صحيحة', 'error');
+        return;
+      }
+      setProducts(data.products);
+      setCustomers(data.customers);
+      setHistory(data.history);
+      state.modal = null;
+      render();
+      toast('اترجعت البيانات بنجاح');
+    }catch(err){
+      toast('حصل خطأ في قراءة الملف', 'error');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+function clearAllData(){
+  if(!confirm('متأكد إنك عايز تمسح كل البيانات؟ الإجراء ده نهائي.')) return;
+  setProducts([]);
+  setCustomers([]);
+  setHistory([]);
+  state.modal = null;
+  render();
+  toast('اتمسحت كل البيانات');
+}
+
 render();
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
 }
 </script>
 </body>
